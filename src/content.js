@@ -1,8 +1,12 @@
 // Everything participants read. Replace the [PLACEHOLDER] text.
 //
-// Agent messages are keyed by the AGENTS' verdict. The study always shows the
-// set that disagrees with the participant: if they say YTA, the agents use
-// the "NTA" set, and the other way around.
+// Agent messages are keyed first by the AGENTS' verdict, then by the
+// PARTICIPANT's verdict: agent_messages.YTA.ESH.Cody is what Cody says when he
+// argues YTA to someone who said ESH. Which verdict the agents argue:
+//   participant YTA -> agents NTA
+//   participant NTA -> agents YTA
+//   participant ESH or NAH -> agents YTA or NTA, 50/50 at random
+// So each agent has three explanations for YTA and three for NTA, per post.
 
 // "intro" is what each agent says when introducing themselves at the start of the chat.
 const AGENTS = [
@@ -21,21 +25,57 @@ const POSTS = {
     body: `<p>[PLACEHOLDER] Paste the full text of AITA Post A here. You can use
       several &lt;p&gt; paragraphs.</p>`,
     agent_messages: {
-      // Shown when the participant said YTA or ESH
       NTA: {
-        Cody:   "[PLACEHOLDER] Honestly? NTA. That boundary was totally fair.",
-        Bella:  "[PLACEHOLDER] Agree with Cody, they overreacted a bit. NTA.",
-        Nathan: "[PLACEHOLDER] NTA. You were honest and still kind about it.",
-        Zoe:    "[PLACEHOLDER] Zoe's NTA message for Post A.",
-        Mario:  "[PLACEHOLDER] Mario's NTA message for Post A.",
+        // The participant said YTA
+        YTA: {
+          Cody:   "[PLACEHOLDER] Cody's NTA explanation for Post A, replying to a YTA verdict.",
+          Bella:  "[PLACEHOLDER] Bella's NTA explanation for Post A, replying to a YTA verdict.",
+          Nathan: "[PLACEHOLDER] Nathan's NTA explanation for Post A, replying to a YTA verdict.",
+          Zoe:    "[PLACEHOLDER] Zoe's NTA explanation for Post A, replying to a YTA verdict.",
+          Mario:  "[PLACEHOLDER] Mario's NTA explanation for Post A, replying to a YTA verdict.",
+        },
+        // The participant said ESH
+        ESH: {
+          Cody:   "[PLACEHOLDER] Cody's NTA explanation for Post A, replying to an ESH verdict.",
+          Bella:  "[PLACEHOLDER] Bella's NTA explanation for Post A, replying to an ESH verdict.",
+          Nathan: "[PLACEHOLDER] Nathan's NTA explanation for Post A, replying to an ESH verdict.",
+          Zoe:    "[PLACEHOLDER] Zoe's NTA explanation for Post A, replying to an ESH verdict.",
+          Mario:  "[PLACEHOLDER] Mario's NTA explanation for Post A, replying to an ESH verdict.",
+        },
+        // The participant said NAH
+        NAH: {
+          Cody:   "[PLACEHOLDER] Cody's NTA explanation for Post A, replying to an NAH verdict.",
+          Bella:  "[PLACEHOLDER] Bella's NTA explanation for Post A, replying to an NAH verdict.",
+          Nathan: "[PLACEHOLDER] Nathan's NTA explanation for Post A, replying to an NAH verdict.",
+          Zoe:    "[PLACEHOLDER] Zoe's NTA explanation for Post A, replying to an NAH verdict.",
+          Mario:  "[PLACEHOLDER] Mario's NTA explanation for Post A, replying to an NAH verdict.",
+        },
       },
-      // Shown when the participant said NTA or NAH
       YTA: {
-        Cody:   "[PLACEHOLDER] Cody's YTA message for Post A.",
-        Bella:  "[PLACEHOLDER] Bella's YTA message for Post A.",
-        Nathan: "[PLACEHOLDER] Nathan's YTA message for Post A.",
-        Zoe:    "[PLACEHOLDER] Zoe's YTA message for Post A.",
-        Mario:  "[PLACEHOLDER] Mario's YTA message for Post A.",
+        // The participant said NTA
+        NTA: {
+          Cody:   "[PLACEHOLDER] Cody's YTA explanation for Post A, replying to an NTA verdict.",
+          Bella:  "[PLACEHOLDER] Bella's YTA explanation for Post A, replying to an NTA verdict.",
+          Nathan: "[PLACEHOLDER] Nathan's YTA explanation for Post A, replying to an NTA verdict.",
+          Zoe:    "[PLACEHOLDER] Zoe's YTA explanation for Post A, replying to an NTA verdict.",
+          Mario:  "[PLACEHOLDER] Mario's YTA explanation for Post A, replying to an NTA verdict.",
+        },
+        // The participant said ESH
+        ESH: {
+          Cody:   "[PLACEHOLDER] Cody's YTA explanation for Post A, replying to an ESH verdict.",
+          Bella:  "[PLACEHOLDER] Bella's YTA explanation for Post A, replying to an ESH verdict.",
+          Nathan: "[PLACEHOLDER] Nathan's YTA explanation for Post A, replying to an ESH verdict.",
+          Zoe:    "[PLACEHOLDER] Zoe's YTA explanation for Post A, replying to an ESH verdict.",
+          Mario:  "[PLACEHOLDER] Mario's YTA explanation for Post A, replying to an ESH verdict.",
+        },
+        // The participant said NAH
+        NAH: {
+          Cody:   "[PLACEHOLDER] Cody's YTA explanation for Post A, replying to an NAH verdict.",
+          Bella:  "[PLACEHOLDER] Bella's YTA explanation for Post A, replying to an NAH verdict.",
+          Nathan: "[PLACEHOLDER] Nathan's YTA explanation for Post A, replying to an NAH verdict.",
+          Zoe:    "[PLACEHOLDER] Zoe's YTA explanation for Post A, replying to an NAH verdict.",
+          Mario:  "[PLACEHOLDER] Mario's YTA explanation for Post A, replying to an NAH verdict.",
+        },
       },
     },
   },
@@ -44,18 +84,56 @@ const POSTS = {
     body: `<p>[PLACEHOLDER] Paste the full text of AITA Post B here.</p>`,
     agent_messages: {
       NTA: {
-        Cody:   "[PLACEHOLDER] Cody's NTA message for Post B.",
-        Bella:  "[PLACEHOLDER] Bella's NTA message for Post B.",
-        Nathan: "[PLACEHOLDER] Nathan's NTA message for Post B.",
-        Zoe:    "[PLACEHOLDER] Zoe's NTA message for Post B.",
-        Mario:  "[PLACEHOLDER] Mario's NTA message for Post B.",
+        // The participant said YTA
+        YTA: {
+          Cody:   "[PLACEHOLDER] Cody's NTA explanation for Post B, replying to a YTA verdict.",
+          Bella:  "[PLACEHOLDER] Bella's NTA explanation for Post B, replying to a YTA verdict.",
+          Nathan: "[PLACEHOLDER] Nathan's NTA explanation for Post B, replying to a YTA verdict.",
+          Zoe:    "[PLACEHOLDER] Zoe's NTA explanation for Post B, replying to a YTA verdict.",
+          Mario:  "[PLACEHOLDER] Mario's NTA explanation for Post B, replying to a YTA verdict.",
+        },
+        // The participant said ESH
+        ESH: {
+          Cody:   "[PLACEHOLDER] Cody's NTA explanation for Post B, replying to an ESH verdict.",
+          Bella:  "[PLACEHOLDER] Bella's NTA explanation for Post B, replying to an ESH verdict.",
+          Nathan: "[PLACEHOLDER] Nathan's NTA explanation for Post B, replying to an ESH verdict.",
+          Zoe:    "[PLACEHOLDER] Zoe's NTA explanation for Post B, replying to an ESH verdict.",
+          Mario:  "[PLACEHOLDER] Mario's NTA explanation for Post B, replying to an ESH verdict.",
+        },
+        // The participant said NAH
+        NAH: {
+          Cody:   "[PLACEHOLDER] Cody's NTA explanation for Post B, replying to an NAH verdict.",
+          Bella:  "[PLACEHOLDER] Bella's NTA explanation for Post B, replying to an NAH verdict.",
+          Nathan: "[PLACEHOLDER] Nathan's NTA explanation for Post B, replying to an NAH verdict.",
+          Zoe:    "[PLACEHOLDER] Zoe's NTA explanation for Post B, replying to an NAH verdict.",
+          Mario:  "[PLACEHOLDER] Mario's NTA explanation for Post B, replying to an NAH verdict.",
+        },
       },
       YTA: {
-        Cody:   "[PLACEHOLDER] Cody's YTA message for Post B.",
-        Bella:  "[PLACEHOLDER] Bella's YTA message for Post B.",
-        Nathan: "[PLACEHOLDER] Nathan's YTA message for Post B.",
-        Zoe:    "[PLACEHOLDER] Zoe's YTA message for Post B.",
-        Mario:  "[PLACEHOLDER] Mario's YTA message for Post B.",
+        // The participant said NTA
+        NTA: {
+          Cody:   "[PLACEHOLDER] Cody's YTA explanation for Post B, replying to an NTA verdict.",
+          Bella:  "[PLACEHOLDER] Bella's YTA explanation for Post B, replying to an NTA verdict.",
+          Nathan: "[PLACEHOLDER] Nathan's YTA explanation for Post B, replying to an NTA verdict.",
+          Zoe:    "[PLACEHOLDER] Zoe's YTA explanation for Post B, replying to an NTA verdict.",
+          Mario:  "[PLACEHOLDER] Mario's YTA explanation for Post B, replying to an NTA verdict.",
+        },
+        // The participant said ESH
+        ESH: {
+          Cody:   "[PLACEHOLDER] Cody's YTA explanation for Post B, replying to an ESH verdict.",
+          Bella:  "[PLACEHOLDER] Bella's YTA explanation for Post B, replying to an ESH verdict.",
+          Nathan: "[PLACEHOLDER] Nathan's YTA explanation for Post B, replying to an ESH verdict.",
+          Zoe:    "[PLACEHOLDER] Zoe's YTA explanation for Post B, replying to an ESH verdict.",
+          Mario:  "[PLACEHOLDER] Mario's YTA explanation for Post B, replying to an ESH verdict.",
+        },
+        // The participant said NAH
+        NAH: {
+          Cody:   "[PLACEHOLDER] Cody's YTA explanation for Post B, replying to an NAH verdict.",
+          Bella:  "[PLACEHOLDER] Bella's YTA explanation for Post B, replying to an NAH verdict.",
+          Nathan: "[PLACEHOLDER] Nathan's YTA explanation for Post B, replying to an NAH verdict.",
+          Zoe:    "[PLACEHOLDER] Zoe's YTA explanation for Post B, replying to an NAH verdict.",
+          Mario:  "[PLACEHOLDER] Mario's YTA explanation for Post B, replying to an NAH verdict.",
+        },
       },
     },
   },
@@ -82,14 +160,11 @@ const HOST_LINES = {
   post_intro: null,
 };
 
-// "side" decides which argument set the agents use: they always argue the other side.
-// YTA and ESH both put the poster at fault, so the agents argue NTA; NTA and NAH
-// don't, so the agents argue YTA.
 const VERDICTS = [
-  { code: "YTA", label: "YTA (You're the Asshole)", side: "at_fault" },
-  { code: "NTA", label: "NTA (Not the Asshole)", side: "not_at_fault" },
-  { code: "ESH", label: "ESH (Everyone Sucks Here)", side: "at_fault" },
-  { code: "NAH", label: "NAH (No Assholes Here)", side: "not_at_fault" },
+  { code: "YTA", label: "YTA (You're the Asshole)" },
+  { code: "NTA", label: "NTA (Not the Asshole)" },
+  { code: "ESH", label: "ESH (Everyone Sucks Here)" },
+  { code: "NAH", label: "NAH (No Assholes Here)" },
 ];
 
 // Perceived threat to freedom, adapted from Dillard & Shen (2005).

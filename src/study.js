@@ -9,9 +9,9 @@ const participantId = url.PROLIFIC_PID || jsPsych.randomization.randomID(10);
 const N_CELLS = CONFIG.COUNTERBALANCE_BASELINE_POSITION ? 8 : 4;
 // On Cognition.run the platform saves the data and assigns a balanced CONDITION itself.
 const ON_COGNITION = typeof CONDITION !== "undefined" || location.hostname.endsWith("cognition.run");
-const sideOf = (v) => VERDICTS.find((x) => x.code === v).side;
-// The verdict the agents argue: the other side from the participant (YTA/ESH -> NTA, NTA/NAH -> YTA).
-const opposite = (v) => (sideOf(v) === "at_fault" ? "NTA" : "YTA");
+// The verdict the agents argue: YTA -> NTA, NTA -> YTA, and ESH or NAH -> YTA or NTA at random.
+const agentVerdictFor = (v) =>
+  v === "YTA" ? "NTA" : v === "NTA" ? "YTA" : jsPsych.randomization.sampleWithoutReplacement(["YTA", "NTA"], 1)[0];
 
 // Balanced assignment through DataPipe if set up; "?cell=0..7" in the URL forces a cell for testing.
 async function getCell() {
@@ -62,15 +62,16 @@ function introChat() {
   };
 }
 
-// Host asks for the verdict, then (by condition) the Host line and the agents arguing the opposite verdict.
+// Host asks for the verdict, then (by condition) the Host line and the agents arguing against it.
 function discussionScript(postId, condition) {
   return [
     host(HOST_LINES.ask_verdict),
     { input: "choice", key: "verdict", choices: VERDICTS.map((v) => ({ label: v.label, value: v.code, say: v.code })) },
     (r) => {
+      r.agent_verdict = agentVerdictFor(r.verdict);
       const agentMsgs = AGENTS.map((a) => ({
         name: a.name, color: a.color, role: "agent",
-        text: POSTS[postId].agent_messages[opposite(r.verdict)][a.name],
+        text: POSTS[postId].agent_messages[r.agent_verdict][r.verdict][a.name],
       }));
       if (condition === "baseline") return [host(HOST_LINES.neutral), ...agentMsgs];
       if (condition === "preemptive") return [host(HOST_LINES.preemptive), ...agentMsgs];
@@ -83,6 +84,7 @@ function discussionBlock(d) {
   const post = POSTS[d.postId];
   const tag = { discussion: d.n, post_id: d.postId, condition: d.condition };
   let initialVerdict = null;
+  let agentVerdict = null;
 
   const read = {
     type: jsPsychHtmlButtonResponse,
@@ -101,7 +103,8 @@ function discussionBlock(d) {
     on_finish: (data) => {
       initialVerdict = data.responses.verdict;
       data.verdict = initialVerdict;
-      data.agent_verdict = opposite(initialVerdict);
+      agentVerdict = data.responses.agent_verdict;
+      data.agent_verdict = agentVerdict;
     },
   };
 
@@ -131,8 +134,9 @@ function discussionBlock(d) {
       data.verdict = VERDICTS[data.response].code;
       data.initial_verdict = initialVerdict;
       data.verdict_changed = data.verdict !== initialVerdict;
-      // Moved to the agents' side, e.g. YTA -> NTA or NAH when the agents argued NTA
-      data.changed_to_agents = sideOf(data.verdict) === sideOf(opposite(initialVerdict));
+      data.agent_verdict = agentVerdict;
+      // Final verdict is the one the agents argued
+      data.changed_to_agents = data.verdict === agentVerdict;
     },
   };
 
@@ -160,6 +164,7 @@ function summaryCsv(info) {
     row[`d${n}_post`] = f.post_id;
     row[`d${n}_condition`] = f.condition;
     row[`d${n}_initial`] = f.initial_verdict;
+    row[`d${n}_agent_verdict`] = f.agent_verdict;
     row[`d${n}_final`] = f.verdict;
     row[`d${n}_changed`] = f.changed_to_agents;
     row[`d${n}_verdict_changed`] = f.verdict_changed;
