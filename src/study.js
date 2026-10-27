@@ -9,7 +9,9 @@ const participantId = url.PROLIFIC_PID || jsPsych.randomization.randomID(10);
 const N_CELLS = CONFIG.COUNTERBALANCE_BASELINE_POSITION ? 8 : 4;
 // On Cognition.run the platform saves the data and assigns a balanced CONDITION itself.
 const ON_COGNITION = typeof CONDITION !== "undefined" || location.hostname.endsWith("cognition.run");
-const opposite = (v) => (v === "YTA" ? "NTA" : "YTA");
+const sideOf = (v) => VERDICTS.find((x) => x.code === v).side;
+// The verdict the agents argue: the other side from the participant (YTA/ESH -> NTA, NTA/NAH -> YTA).
+const opposite = (v) => (sideOf(v) === "at_fault" ? "NTA" : "YTA");
 
 // Balanced assignment through DataPipe if set up; "?cell=0..7" in the URL forces a cell for testing.
 async function getCell() {
@@ -37,6 +39,8 @@ function postHtml(post) {
 
 const verdictButtons = {
   choices: VERDICTS.map((v) => v.label),
+  grid_rows: null,
+  grid_columns: 2,
 };
 
 const host = (text) => ({ name: HOST.name, color: HOST.color, role: "host", text });
@@ -126,7 +130,9 @@ function discussionBlock(d) {
     on_finish: (data) => {
       data.verdict = VERDICTS[data.response].code;
       data.initial_verdict = initialVerdict;
-      data.changed_to_agents = data.verdict === opposite(initialVerdict);
+      data.verdict_changed = data.verdict !== initialVerdict;
+      // Moved to the agents' side, e.g. YTA -> NTA or NAH when the agents argued NTA
+      data.changed_to_agents = sideOf(data.verdict) === sideOf(opposite(initialVerdict));
     },
   };
 
@@ -156,6 +162,7 @@ function summaryCsv(info) {
     row[`d${n}_initial`] = f.initial_verdict;
     row[`d${n}_final`] = f.verdict;
     row[`d${n}_changed`] = f.changed_to_agents;
+    row[`d${n}_verdict_changed`] = f.verdict_changed;
     THREAT_ITEMS.forEach((q) => { row[`d${n}_${q.name}`] = th[q.name]; });
     row[`d${n}_threat_mean`] = th.threat_mean;
     row[`d${n}_manip`] = get("manipulation_check").manip_answer;
