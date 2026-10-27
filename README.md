@@ -4,7 +4,7 @@ Open `index.html` in a browser to try it. All libraries are in `lib/`, so it nee
 
 ## What to edit
 
-- `src/content.js`: the two AITA posts, the five agents' messages (one set for when the agents say NTA and one for when they say YTA, for each post), the Host lines, the survey items, and the consent and debrief text. Search for `[PLACEHOLDER]`.
+- `src/content.js`: the two AITA posts, the agents' self-introductions and the Host's opening lines (`INTRO_LINES`), the five agents' messages (one set for when the agents say NTA and one for when they say YTA, for each post), the Host lines, the survey items, and the consent and debrief text. Search for `[PLACEHOLDER]`.
 - `src/config.js`: your DataPipe ID, your Prolific completion code, and the typing speed.
 
 The agents always take the side opposite to the participant's first verdict on that post.
@@ -13,7 +13,9 @@ The agents always take the side opposite to the participant's first verdict on t
 
 Every participant reads both posts. The chat page differs by condition:
 
-| Condition | Chat shown |
+In every condition the discussion chat opens with the Host asking for the participant's verdict (NTA or YTA), which they give with buttons in the chat. What follows depends on the condition:
+
+| Condition | Chat shown after the verdict |
 |---|---|
 | baseline | Host neutral line, then the 5 agents |
 | preemptive (Group 1) | Host freedom-restoring line, then the 5 agents |
@@ -36,12 +38,12 @@ To test a specific cell, add `?cell=5` to the URL.
 
 ## Flow
 
-Consent → instructions → for each post: initial verdict → chat → perceived threat (4 items, 1–5; the attention check is mixed into the second set) → final verdict → manipulation check → save data → debrief → redirect to Prolific.
+Consent → instructions → introduction chat (the Host welcomes everyone, each agent introduces themselves, the Host asks the participant to introduce themselves in one sentence, which they type, and the Host thanks them) → for each post: read the post → chat (Host asks for the verdict, participant answers in the chat, then the Host line and agents by condition) → perceived threat (4 items, 1–5; the attention check is mixed into the second set) → final verdict → manipulation check → save data → debrief → redirect to Prolific.
 
 ## Data
 
 Two CSV files are saved for each participant:
-- `<id>_summary.csv`: one row with group, cell, and for each discussion the post, condition, initial and final verdict, `changed` (switched to the agents' side), the four threat items, the threat mean, the manipulation-check answer, plus `attention_pass`. Stack these files for the analysis.
+- `<id>_summary.csv`: one row with group, cell, and for each discussion the post, condition, initial and final verdict, `changed` (switched to the agents' side), the four threat items, the threat mean, the manipulation-check answer, plus `attention_pass` and `self_intro` (the sentence the participant typed). Stack these files for the analysis.
 - `<id>_trials.csv`: every screen with timestamps, response times, and the exact chat messages that were shown.
 
 If no DataPipe ID is set (test mode), both files download at the end.

@@ -39,16 +39,40 @@ const verdictButtons = {
   choices: VERDICTS.map((v) => v.label),
 };
 
-function chatMessages(postId, condition, initialVerdict) {
-  const agentVerdict = opposite(initialVerdict);
-  const agentMsgs = AGENTS.map((a) => ({
-    name: a.name, color: a.color, role: "agent",
-    text: POSTS[postId].agent_messages[agentVerdict][a.name],
-  }));
-  const host = (text) => ({ name: HOST.name, color: HOST.color, role: "host", text });
-  if (condition === "baseline") return [host(HOST_LINES.neutral), ...agentMsgs];
-  if (condition === "preemptive") return [host(HOST_LINES.preemptive), ...agentMsgs];
-  return [...(HOST_LINES.post_intro ? [host(HOST_LINES.post_intro)] : []), ...agentMsgs, host(HOST_LINES.post)];
+const host = (text) => ({ name: HOST.name, color: HOST.color, role: "host", text });
+
+// Shown once before the first post: Host welcome, each agent's intro, then the participant's.
+function introChat() {
+  return {
+    type: jsPsychChat,
+    script: [
+      host(INTRO_LINES.welcome),
+      ...AGENTS.map((a) => ({ name: a.name, color: a.color, role: "agent", text: a.intro })),
+      host(INTRO_LINES.ask_participant),
+      { input: "text", key: "self_intro", placeholder: INTRO_LINES.participant_placeholder, min_chars: 2 },
+      host(INTRO_LINES.thanks),
+    ],
+    typing: CONFIG.TYPING,
+    data: { measure: "intro_chat" },
+    on_finish: (data) => { data.self_intro = data.responses.self_intro; },
+  };
+}
+
+// Host asks for the verdict, then (by condition) the Host line and the agents arguing the opposite verdict.
+function discussionScript(postId, condition) {
+  return [
+    host(HOST_LINES.ask_verdict),
+    { input: "choice", key: "verdict", choices: VERDICTS.map((v) => ({ label: v.label, value: v.code, say: v.code })) },
+    (r) => {
+      const agentMsgs = AGENTS.map((a) => ({
+        name: a.name, color: a.color, role: "agent",
+        text: POSTS[postId].agent_messages[opposite(r.verdict)][a.name],
+      }));
+      if (condition === "baseline") return [host(HOST_LINES.neutral), ...agentMsgs];
+      if (condition === "preemptive") return [host(HOST_LINES.preemptive), ...agentMsgs];
+      return [...(HOST_LINES.post_intro ? [host(HOST_LINES.post_intro)] : []), ...agentMsgs, host(HOST_LINES.post)];
+    },
+  ];
 }
 
 function discussionBlock(d) {
@@ -56,25 +80,25 @@ function discussionBlock(d) {
   const tag = { discussion: d.n, post_id: d.postId, condition: d.condition };
   let initialVerdict = null;
 
-  const initial = {
+  const read = {
     type: jsPsychHtmlButtonResponse,
-    stimulus: `<p class="step">Post ${d.n} of 2</p>${postHtml(post)}<p><b>What is your verdict?</b></p>`,
-    ...verdictButtons,
-    data: { ...tag, measure: "initial_verdict" },
-    on_finish: (data) => {
-      initialVerdict = VERDICTS[data.response].code;
-      data.verdict = initialVerdict;
-      data.agent_verdict = opposite(initialVerdict);
-    },
+    stimulus: `<p class="step">Post ${d.n} of 2</p>${postHtml(post)}<p>${TEXT.read_post}</p>`,
+    choices: ["Go to the group chat"],
+    data: { ...tag, measure: "read_post" },
   };
 
+  // The initial verdict is given in the chat, so this trial also holds it.
   const chat = {
     type: jsPsychChat,
     context_html: postHtml(post),
-    participant_message: () => `My verdict: ${initialVerdict}`,
-    messages: () => chatMessages(d.postId, d.condition, initialVerdict),
+    script: discussionScript(d.postId, d.condition),
     typing: CONFIG.TYPING,
     data: { ...tag, measure: "chat" },
+    on_finish: (data) => {
+      initialVerdict = data.responses.verdict;
+      data.verdict = initialVerdict;
+      data.agent_verdict = opposite(initialVerdict);
+    },
   };
 
   const items = THREAT_ITEMS.map((q) => ({ ...q, labels: LIKERT_5, required: true }));
@@ -113,7 +137,7 @@ function discussionBlock(d) {
     on_finish: (data) => { data.manip_answer = data.response.manip; },
   };
 
-  return [initial, chat, threat, final, manipulation];
+  return [read, chat, threat, final, manipulation];
 }
 
 // One row per participant, ready for analysis.
@@ -137,6 +161,7 @@ function summaryCsv(info) {
     row[`d${n}_manip`] = get("manipulation_check").manip_answer;
     if (n === 2) row.attention_pass = th.attention_pass;
   });
+  row.self_intro = (all.filter({ measure: "intro_chat" }).values()[0] || {}).self_intro;
   row.total_time_ms = all.last(1).values()[0].time_elapsed;
   const keys = Object.keys(row);
   const cell = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
@@ -204,6 +229,7 @@ async function main() {
   await jsPsych.run([
     consent,
     instructions,
+    introChat(),
     ...discussionBlock(discussions[0]),
     ...discussionBlock(discussions[1]),
     ...save,
