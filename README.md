@@ -13,7 +13,7 @@ Participants choose from four verdicts: YTA, NTA, ESH (everyone sucks here), and
 
 Every participant reads both posts. The chat page differs by condition:
 
-In every condition the discussion chat opens with the Host asking for the participant's verdict (YTA, NTA, ESH, or NAH), which they give with buttons in the chat. What follows depends on the condition:
+In every condition the discussion chat opens with the Host asking for the participant's verdict (YTA, NTA, ESH, or NAH), which they give with buttons in the chat, followed by a typed explanation of a sentence or two. What follows depends on the condition:
 
 | Condition | Chat shown after the verdict |
 |---|---|
@@ -38,12 +38,14 @@ To test a specific cell, add `?cell=5` to the URL.
 
 ## Flow
 
-Consent → instructions → introduction chat (the Host welcomes everyone, each agent introduces themselves, the Host asks the participant to introduce themselves in one sentence, which they type, and the Host thanks them) → for each post: read the post → chat (Host asks for the verdict, participant answers in the chat, then the Host line and agents by condition) → perceived threat (4 items, 1–5; the attention check is mixed into the second set) → final verdict → manipulation check → save data → debrief → redirect to Prolific.
+Consent → instructions → for each post: read the post → chat → perceived threat (4 items, 1–5; the attention check is mixed into the second set) → final verdict → manipulation check → save data → debrief → redirect to Prolific.
+
+The first chat opens with introductions: the Host welcomes everyone, each agent introduces themselves, and the participant types a one-sentence intro. Then, in every chat, the Host asks for the verdict (four buttons), the participant types a sentence or two explaining it, and the Host line and agents follow by condition.
 
 ## Data
 
 Two CSV files are saved for each participant:
-- `<id>_summary.csv`: one row with group, cell, and for each discussion the post, condition, initial and final verdict, the agents' verdict, `changed` (final verdict is the one the agents argued), `verdict_changed` (any change of verdict), the four threat items, the threat mean, the manipulation-check answer, plus `attention_pass` and `self_intro` (the sentence the participant typed). Stack these files for the analysis.
+- `<id>_summary.csv`: one row with group, cell, and for each discussion the post, condition, initial and final verdict, the agents' verdict, `changed` (final verdict is the one the agents argued), `verdict_changed` (any change of verdict), the four threat items, the threat mean, the manipulation-check answer, plus `attention_pass` `self_intro` (the sentence the participant typed), and each discussion's `explanation`. Stack these files for the analysis.
 - `<id>_trials.csv`: every screen with timestamps, response times, and the exact chat messages that were shown.
 
 If no DataPipe ID is set (test mode), both files download at the end.
