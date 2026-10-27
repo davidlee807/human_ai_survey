@@ -21,7 +21,7 @@ const POSTS = {
     body: `<p>[PLACEHOLDER] Paste the full text of AITA Post A here. You can use
       several &lt;p&gt; paragraphs.</p>`,
     agent_messages: {
-      // Shown when the participant said YTA
+      // Shown when the participant said YTA or ESH
       NTA: {
         Cody:   "[PLACEHOLDER] Honestly? NTA. That boundary was totally fair.",
         Bella:  "[PLACEHOLDER] Agree with Cody, they overreacted a bit. NTA.",
@@ -29,7 +29,7 @@ const POSTS = {
         Zoe:    "[PLACEHOLDER] Zoe's NTA message for Post A.",
         Mario:  "[PLACEHOLDER] Mario's NTA message for Post A.",
       },
-      // Shown when the participant said NTA
+      // Shown when the participant said NTA or NAH
       YTA: {
         Cody:   "[PLACEHOLDER] Cody's YTA message for Post A.",
         Bella:  "[PLACEHOLDER] Bella's YTA message for Post A.",
@@ -71,7 +71,7 @@ const INTRO_LINES = {
 
 const HOST_LINES = {
   // Shown at the start of each discussion chat: the Host asks for the participant's verdict
-  ask_verdict: "Having read the post, what is your verdict: YTA (You're the Asshole) or NTA (Not the Asshole)?",
+  ask_verdict: "Having read the post, what is your verdict: YTA (You're the Asshole), NTA (Not the Asshole), ESH (Everyone Sucks Here), or NAH (No Assholes Here)?",
   // Baseline: neutral line, shown after the verdict and before the agents
   neutral: "Here is what the agents think about this post.",
   // Group 1: freedom-restoring line, shown after the verdict and before the agents
@@ -82,9 +82,14 @@ const HOST_LINES = {
   post_intro: null,
 };
 
+// "side" decides which argument set the agents use: they always argue the other side.
+// YTA and ESH both put the poster at fault, so the agents argue NTA; NTA and NAH
+// don't, so the agents argue YTA.
 const VERDICTS = [
-  { code: "YTA", label: "YTA (You're the Asshole)" },
-  { code: "NTA", label: "NTA (Not the Asshole)" },
+  { code: "YTA", label: "YTA (You're the Asshole)", side: "at_fault" },
+  { code: "NTA", label: "NTA (Not the Asshole)", side: "not_at_fault" },
+  { code: "ESH", label: "ESH (Everyone Sucks Here)", side: "at_fault" },
+  { code: "NAH", label: "NAH (No Assholes Here)", side: "not_at_fault" },
 ];
 
 // Perceived threat to freedom, adapted from Dillard & Shen (2005).

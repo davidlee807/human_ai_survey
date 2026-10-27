@@ -7,13 +7,13 @@ Open `index.html` in a browser to try it. All libraries are in `lib/`, so it nee
 - `src/content.js`: the two AITA posts, the agents' self-introductions and the Host's opening lines (`INTRO_LINES`), the five agents' messages (one set for when the agents say NTA and one for when they say YTA, for each post), the Host lines, the survey items, and the consent and debrief text. Search for `[PLACEHOLDER]`.
 - `src/config.js`: your DataPipe ID, your Prolific completion code, and the typing speed.
 
-The agents always take the side opposite to the participant's first verdict on that post.
+Participants choose from four verdicts: YTA, NTA, ESH (everyone sucks here), and NAH (no assholes here). The agents always argue the other side from the participant's first verdict on that post: YTA or ESH (the poster is at fault) gets the NTA arguments, and NTA or NAH (the poster is not at fault) gets the YTA arguments.
 
 ## Conditions
 
 Every participant reads both posts. The chat page differs by condition:
 
-In every condition the discussion chat opens with the Host asking for the participant's verdict (NTA or YTA), which they give with buttons in the chat. What follows depends on the condition:
+In every condition the discussion chat opens with the Host asking for the participant's verdict (YTA, NTA, ESH, or NAH), which they give with buttons in the chat. What follows depends on the condition:
 
 | Condition | Chat shown after the verdict |
 |---|---|
@@ -43,7 +43,7 @@ Consent → instructions → introduction chat (the Host welcomes everyone, each
 ## Data
 
 Two CSV files are saved for each participant:
-- `<id>_summary.csv`: one row with group, cell, and for each discussion the post, condition, initial and final verdict, `changed` (switched to the agents' side), the four threat items, the threat mean, the manipulation-check answer, plus `attention_pass` and `self_intro` (the sentence the participant typed). Stack these files for the analysis.
+- `<id>_summary.csv`: one row with group, cell, and for each discussion the post, condition, initial and final verdict, `changed` (moved to the agents' side, e.g. ESH → NAH when the agents argued NTA), `verdict_changed` (any change of verdict), the four threat items, the threat mean, the manipulation-check answer, plus `attention_pass` and `self_intro` (the sentence the participant typed). Stack these files for the analysis.
 - `<id>_trials.csv`: every screen with timestamps, response times, and the exact chat messages that were shown.
 
 If no DataPipe ID is set (test mode), both files download at the end.
