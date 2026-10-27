@@ -13,7 +13,7 @@ var jsPsychChat = (function (jspsych) {
       context_label: { type: jspsych.ParameterType.STRING, default: "Show the post again" },
       // Steps played in order. Each step is one of:
       //   { name, color, role: "host" | "agent", text }                 a message
-      //   { input: "text", key, placeholder, min_chars }                participant types a reply
+      //   { input: "text", key, placeholder, min_chars, max_chars }     participant types a reply
       //   { input: "choice", key, choices: [{ label, value, say }] }    participant clicks a button
       //   (responses) => [steps]   steps built from earlier replies, e.g. agents answering the verdict
       script: { type: jspsych.ParameterType.COMPLEX, array: true, default: [] },
@@ -84,7 +84,7 @@ var jsPsychChat = (function (jspsych) {
       };
 
       const askText = (s) => {
-        inputArea.innerHTML = `<input type="text" class="chat-text" placeholder="${escapeHtml(s.placeholder || "Type your message...")}" maxlength="300"><button class="jspsych-btn chat-send" disabled>Send</button>`;
+        inputArea.innerHTML = `<input type="text" class="chat-text" placeholder="${escapeHtml(s.placeholder || "Type your message...")}" maxlength="${s.max_chars || 300}"><button class="jspsych-btn chat-send" disabled>Send</button>`;
         const field = inputArea.querySelector(".chat-text");
         const send = inputArea.querySelector(".chat-send");
         const ok = () => field.value.trim().length >= (s.min_chars || 2);

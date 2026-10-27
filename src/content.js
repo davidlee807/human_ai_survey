@@ -139,9 +139,9 @@ const POSTS = {
   },
 };
 
-// The opening of the group chat, shown once before the first post.
+// The opening of the group chat, shown once at the start of the first chat (after the first post).
 const INTRO_LINES = {
-  welcome: "Welcome! Today we'll read some posts from Reddit's \"Am I the Asshole?\" community and share our thoughts on them. Before we start, let's all introduce ourselves!",
+  welcome: "Welcome! We'll be discussing posts from Reddit's \"Am I the Asshole?\" community, starting with the one you just read. Before we start, let's all introduce ourselves!",
   ask_participant: "Now it's your turn. Could you please introduce yourself briefly in a single sentence?",
   participant_placeholder: "Introduce yourself in one sentence...",
   thanks: "Thanks! Now that we know each other, we'll take turns to discuss our thoughts on these posts.",
@@ -150,6 +150,9 @@ const INTRO_LINES = {
 const HOST_LINES = {
   // Shown at the start of each discussion chat: the Host asks for the participant's verdict
   ask_verdict: "Having read the post, what is your verdict: YTA (You're the Asshole), NTA (Not the Asshole), ESH (Everyone Sucks Here), or NAH (No Assholes Here)?",
+  // Asked right after the verdict; the participant types a sentence or two
+  ask_explanation: "Could you briefly explain your verdict in a sentence or two?",
+  explanation_placeholder: "Explain your verdict in a sentence or two...",
   // Baseline: neutral line, shown after the verdict and before the agents
   neutral: "Here is what the agents think about this post.",
   // Group 1: freedom-restoring line, shown after the verdict and before the agents
@@ -194,11 +197,12 @@ const TEXT = {
     <p>[PLACEHOLDER] Study purpose, what participants will do, about how long it takes,
     payment, risks, data storage, contact details, and the right to stop at any time.</p>`,
   instructions: `<h2>Instructions</h2>
-    <p>You will join a group chat with a Host and five AI agents. Everyone will first
-    introduce themselves, and you will be asked to introduce yourself in one sentence.</p>
-    <p>You will then read two posts from Reddit's "Am I the Asshole?" (AITA) community.
-    For each post you will give your verdict in the chat, read what the agents think,
-    and then answer a few questions.</p>`,
+    <p>You will read two posts from Reddit's "Am I the Asshole?" (AITA) community and
+    discuss each one in a group chat with a Host and five AI agents.</p>
+    <p>After the first post, everyone in the chat will introduce themselves, and you will
+    be asked to introduce yourself in one sentence. For each post you will then give your
+    verdict, explain it in a sentence or two, read what the agents think, and answer a
+    few questions.</p>`,
   read_post: "Please read this post carefully. You will give your verdict in the group chat next.",
   debrief: `<h2>[PLACEHOLDER] Debrief</h2>
     <p>[PLACEHOLDER] Explain that the agents' messages were written in advance and always

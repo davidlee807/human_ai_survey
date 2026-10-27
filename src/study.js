@@ -45,28 +45,24 @@ const verdictButtons = {
 
 const host = (text) => ({ name: HOST.name, color: HOST.color, role: "host", text });
 
-// Shown once before the first post: Host welcome, each agent's intro, then the participant's.
-function introChat() {
-  return {
-    type: jsPsychChat,
-    script: [
-      host(INTRO_LINES.welcome),
-      ...AGENTS.map((a) => ({ name: a.name, color: a.color, role: "agent", text: a.intro })),
-      host(INTRO_LINES.ask_participant),
-      { input: "text", key: "self_intro", placeholder: INTRO_LINES.participant_placeholder, min_chars: 2 },
-      host(INTRO_LINES.thanks),
-    ],
-    typing: CONFIG.TYPING,
-    data: { measure: "intro_chat" },
-    on_finish: (data) => { data.self_intro = data.responses.self_intro; },
-  };
+// Opens the first chat, after the first post: Host welcome, each agent's intro, then the participant's.
+function introScript() {
+  return [
+    host(INTRO_LINES.welcome),
+    ...AGENTS.map((a) => ({ name: a.name, color: a.color, role: "agent", text: a.intro })),
+    host(INTRO_LINES.ask_participant),
+    { input: "text", key: "self_intro", placeholder: INTRO_LINES.participant_placeholder, min_chars: 2 },
+    host(INTRO_LINES.thanks),
+  ];
 }
 
-// Host asks for the verdict, then (by condition) the Host line and the agents arguing against it.
+// Host asks for the verdict and a short explanation, then (by condition) the Host line and the agents arguing against it.
 function discussionScript(postId, condition) {
   return [
     host(HOST_LINES.ask_verdict),
     { input: "choice", key: "verdict", choices: VERDICTS.map((v) => ({ label: v.label, value: v.code, say: v.code })) },
+    host(HOST_LINES.ask_explanation),
+    { input: "text", key: "explanation", placeholder: HOST_LINES.explanation_placeholder, min_chars: 10, max_chars: 600 },
     (r) => {
       r.agent_verdict = agentVerdictFor(r.verdict);
       const agentMsgs = AGENTS.map((a) => ({
@@ -93,16 +89,19 @@ function discussionBlock(d) {
     data: { ...tag, measure: "read_post" },
   };
 
-  // The initial verdict is given in the chat, so this trial also holds it.
+  // The initial verdict and explanation are given in the chat (and, in the first chat,
+  // the introductions), so this trial also holds them.
   const chat = {
     type: jsPsychChat,
     context_html: postHtml(post),
-    script: discussionScript(d.postId, d.condition),
+    script: [...(d.n === 1 ? introScript() : []), ...discussionScript(d.postId, d.condition)],
     typing: CONFIG.TYPING,
     data: { ...tag, measure: "chat" },
     on_finish: (data) => {
       initialVerdict = data.responses.verdict;
       data.verdict = initialVerdict;
+      data.explanation = data.responses.explanation;
+      if (d.n === 1) data.self_intro = data.responses.self_intro;
       agentVerdict = data.responses.agent_verdict;
       data.agent_verdict = agentVerdict;
     },
@@ -164,6 +163,7 @@ function summaryCsv(info) {
     row[`d${n}_post`] = f.post_id;
     row[`d${n}_condition`] = f.condition;
     row[`d${n}_initial`] = f.initial_verdict;
+    row[`d${n}_explanation`] = get("chat").explanation;
     row[`d${n}_agent_verdict`] = f.agent_verdict;
     row[`d${n}_final`] = f.verdict;
     row[`d${n}_changed`] = f.changed_to_agents;
@@ -173,7 +173,7 @@ function summaryCsv(info) {
     row[`d${n}_manip`] = get("manipulation_check").manip_answer;
     if (n === 2) row.attention_pass = th.attention_pass;
   });
-  row.self_intro = (all.filter({ measure: "intro_chat" }).values()[0] || {}).self_intro;
+  row.self_intro = (all.filter({ discussion: 1, measure: "chat" }).values()[0] || {}).self_intro;
   row.total_time_ms = all.last(1).values()[0].time_elapsed;
   const keys = Object.keys(row);
   const cell = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
@@ -241,7 +241,6 @@ async function main() {
   await jsPsych.run([
     consent,
     instructions,
-    introChat(),
     ...discussionBlock(discussions[0]),
     ...discussionBlock(discussions[1]),
     ...save,
