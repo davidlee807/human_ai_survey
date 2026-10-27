@@ -35,3 +35,9 @@ body { background: #f4f4f2; }
 
 .chat-continue { align-self: center; opacity: .5; }
 .chat-continue.ready { opacity: 1; }
+
+.msg-host .avatar, .avatar-self { font-size: 11px; }
+.chat-input { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.chat-input:empty { display: none; }
+.chat-text { flex: 1; min-width: 0; font-size: 16px; padding: 10px 12px; border: 1px solid #bbb; border-radius: 8px; }
+.chat-input .jspsych-btn { margin: 0; }
