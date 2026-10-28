@@ -44,15 +44,17 @@ The first chat opens with introductions: the Host welcomes everyone, each agent 
 
 A reminder of what YTA, NTA, ESH and NAH mean stays at the top of the page from the first post on. The 2nd and 4th agents open with "I agree with <previous agent>." (`AGREE_PREFIX` in `src/content.js`). The explanation after the verdict is optional.
 
-## Saving responses (Firebase)
+## Saving responses (Google Sheets)
 
-When `CONFIG.FIREBASE.apiKey` is set, each participant's data is saved at the end as one document in the Firestore collection `responses` (document ID = Prolific ID or a random ID). The document holds the summary row as fields plus the full trial CSV in `trials_csv`. Participants see "Saving your responses..." and a "Try again" button if the save fails.
+When `CONFIG.GOOGLE_SHEETS_URL` is set, each participant's data is sent at the end to a small Google Apps Script (`google/Code.gs`) that writes it into your Google Sheet: one row per participant in the `summary` tab, and one row per screen in the `trials` tab. Participants see "Saving your responses..." and a "Try again" button if the send fails.
 
-1. Create a project at https://console.firebase.google.com (Google Analytics not needed).
-2. Build → Firestore Database → Create database (production mode, any location).
-3. Firestore → Rules: paste `firestore.rules` from this repo and Publish.
-4. Project settings → Your apps → add a Web app. Copy `apiKey` and `projectId` into `CONFIG.FIREBASE` in `src/config.js`.
-5. To download the data: `pip install firebase-admin`, save a service-account key (Project settings → Service accounts → Generate new private key) as `tools/service-account.json`, and run `python tools/export_responses.py`. It writes `data/summary.csv` and `data/trials/<id>.csv`. Never commit the key.
+1. Create a new Google Sheet (sheets.new).
+2. Extensions → Apps Script. Delete what's there, paste all of `google/Code.gs`, and click Save.
+3. Deploy → New deployment → type **Web app**. Execute as: **Me**. Who has access: **Anyone**. Click Deploy and allow access when Google asks.
+4. Copy the web app URL (ends in `/exec`) into `GOOGLE_SHEETS_URL` in `src/config.js`.
+5. If you edit the script later, use Deploy → Manage deployments → edit → New version, so the URL stays the same.
+
+The URL only lets the page add rows; it can't read your Sheet. Anyone who finds it could send junk rows, so check `participant_id` / `prolific_pid` against Prolific when you analyse.
 
 Without DataPipe, participants are assigned to one of the 8 cells at random rather than in strict balance.
 

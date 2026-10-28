@@ -179,25 +179,20 @@ function summaryCsv(info) {
   return keys.join(",") + "\n" + keys.map((k) => cell(row[k])).join(",") + "\n";
 }
 
-// Save one Firestore document per participant: the summary row as fields, plus the
-// full trial-by-trial CSV as text. Uses the Firestore REST API, so no SDK is needed.
-async function saveToFirebase(info) {
-  const fb = CONFIG.FIREBASE;
-  const value = (v) =>
-    v === null || v === undefined ? { nullValue: null }
-    : typeof v === "boolean" ? { booleanValue: v }
-    : typeof v === "number" ? { doubleValue: v }
-    : { stringValue: String(v) };
-  const fields = {};
-  Object.entries(summaryRow(info)).forEach(([k, v]) => { fields[k] = value(v); });
-  fields.trials_csv = value(jsPsych.data.get().csv());
-  fields.saved_at = { timestampValue: new Date().toISOString() };
-  const endpoint = `https://firestore.googleapis.com/v1/projects/${fb.projectId}/databases/(default)/documents/` +
-    `${fb.collection}?documentId=${encodeURIComponent(participantId)}&key=${fb.apiKey}`;
+// Send the participant's data to the Google Apps Script web app, which adds one row
+// to the "summary" sheet and one row per screen to the "trials" sheet.
+// Apps Script doesn't allow reading the reply from another site ("no-cors"), so a
+// request that goes out without a network error counts as saved; the script
+// ignores a participant ID it has already stored, so a retry can't duplicate rows.
+async function saveToGoogleSheets(info) {
+  const flat = (v) => (v !== null && typeof v === "object" ? JSON.stringify(v) : v);
+  const trials = jsPsych.data.get().values().map((t) =>
+    Object.fromEntries(Object.entries(t).map(([k, v]) => [k, flat(v)])));
+  const body = JSON.stringify({ summary: summaryRow(info), trials });
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
-      const res = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fields }) });
-      if (res.ok || res.status === 409) return true; // 409: already saved
+      await fetch(CONFIG.GOOGLE_SHEETS_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body });
+      return true;
     } catch (e) { /* network error, retry */ }
     await new Promise((r) => setTimeout(r, 1500 * attempt));
   }
@@ -230,13 +225,13 @@ async function main() {
   };
   const instructions = { type: jsPsychHtmlButtonResponse, stimulus: TEXT.instructions, choices: ["Start"] };
 
-  const firebaseSave = {
+  const sheetsSave = {
     type: jsPsychHtmlButtonResponse,
     stimulus: "<p>Saving your responses, please wait...</p>",
     choices: [],
     data: { measure: "save" },
     on_load: async () => {
-      const ok = await saveToFirebase(info);
+      const ok = await saveToGoogleSheets(info);
       if (ok) jsPsych.finishTrial({ saved: true });
       else jsPsych.getDisplayElement().innerHTML = `<p>Sorry, we could not save your responses.
         Please check your internet connection and try again.</p>
@@ -244,13 +239,13 @@ async function main() {
       const retry = document.getElementById("retry-save");
       if (retry) retry.addEventListener("click", async () => {
         retry.disabled = true;
-        if (await saveToFirebase(info)) jsPsych.finishTrial({ saved: true });
+        if (await saveToGoogleSheets(info)) jsPsych.finishTrial({ saved: true });
         else retry.disabled = false;
       });
     },
   };
 
-  const save = ON_COGNITION ? [] : CONFIG.FIREBASE.apiKey ? [firebaseSave] : CONFIG.DATAPIPE_ID
+  const save = ON_COGNITION ? [] : CONFIG.GOOGLE_SHEETS_URL ? [sheetsSave] : CONFIG.DATAPIPE_ID
     ? [
         { type: jsPsychPipe, action: "save", experiment_id: CONFIG.DATAPIPE_ID,
           filename: `${participantId}_trials.csv`, data_string: () => jsPsych.data.get().csv() },
