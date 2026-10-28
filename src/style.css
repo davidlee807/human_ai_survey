@@ -42,3 +42,7 @@ body { background: #f4f4f2; }
 .chat-text { flex: 1; min-width: 0; font-size: 16px; padding: 10px 12px; border: 1px solid #bbb; border-radius: 8px; }
 .chat-input .jspsych-btn { margin: 0; }
 .chat-choice { flex: 1 1 40%; max-width: 320px; }
+
+.verdict-key { display: none; position: sticky; top: 0; z-index: 10; background: #fff; border-bottom: 1px solid #ddd;
+  padding: 6px 16px; font-size: 14px; color: #444; text-align: center; line-height: 1.6; }
+.show-verdict-key .verdict-key { display: block; }

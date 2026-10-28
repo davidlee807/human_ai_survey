@@ -62,12 +62,13 @@ function discussionScript(postId, condition) {
     host(HOST_LINES.ask_verdict),
     { input: "choice", key: "verdict", choices: VERDICTS.map((v) => ({ label: v.label, value: v.code, say: v.code })) },
     host(HOST_LINES.ask_explanation),
-    { input: "text", key: "explanation", placeholder: HOST_LINES.explanation_placeholder, min_chars: 10, max_chars: 600 },
+    { input: "text", key: "explanation", placeholder: HOST_LINES.explanation_placeholder, min_chars: 0, max_chars: 600 },
     (r) => {
       r.agent_verdict = agentVerdictFor(r.verdict);
-      const agentMsgs = AGENTS.map((a) => ({
+      const agentMsgs = AGENTS.map((a, i) => ({
         name: a.name, color: a.color, role: "agent",
-        text: POSTS[postId].agent_messages[r.agent_verdict][r.verdict][a.name],
+        text: (i === 1 || i === 3 ? AGREE_PREFIX.replace("{name}", AGENTS[i - 1].name) : "") +
+          POSTS[postId].agent_messages[r.agent_verdict][r.verdict][a.name],
       }));
       if (condition === "baseline") return [host(HOST_LINES.neutral), ...agentMsgs];
       if (condition === "preemptive") return [host(HOST_LINES.preemptive), ...agentMsgs];
@@ -84,6 +85,7 @@ function discussionBlock(d) {
 
   const read = {
     type: jsPsychHtmlButtonResponse,
+    on_start: () => document.body.classList.add("show-verdict-key"),
     stimulus: `<p class="step">Post ${d.n} of 2</p>${postHtml(post)}<p>${TEXT.read_post}</p>`,
     choices: ["Go to the group chat"],
     data: { ...tag, measure: "read_post" },
@@ -139,14 +141,7 @@ function discussionBlock(d) {
     },
   };
 
-  const manipulation = {
-    type: jsPsychSurveyMultiChoice,
-    questions: [{ name: "manip", prompt: MANIPULATION_CHECK.prompt, options: MANIPULATION_CHECK.options, required: true }],
-    data: { ...tag, measure: "manipulation_check" },
-    on_finish: (data) => { data.manip_answer = data.response.manip; },
-  };
-
-  return [read, chat, threat, final, manipulation];
+  return [read, chat, threat, final];
 }
 
 // One row per participant, ready for analysis.
@@ -170,7 +165,6 @@ function summaryCsv(info) {
     row[`d${n}_verdict_changed`] = f.verdict_changed;
     THREAT_ITEMS.forEach((q) => { row[`d${n}_${q.name}`] = th[q.name]; });
     row[`d${n}_threat_mean`] = th.threat_mean;
-    row[`d${n}_manip`] = get("manipulation_check").manip_answer;
     if (n === 2) row.attention_pass = th.attention_pass;
   });
   row.self_intro = (all.filter({ discussion: 1, measure: "chat" }).values()[0] || {}).self_intro;
@@ -181,6 +175,7 @@ function summaryCsv(info) {
 }
 
 async function main() {
+  document.body.insertAdjacentHTML("afterbegin", `<div class="verdict-key">${TEXT.verdict_key}</div>`);
   const info = decodeCell(await getCell());
   const secondPost = info.firstPost === "A" ? "B" : "A";
   const discussions = [
@@ -212,9 +207,10 @@ async function main() {
         { type: jsPsychPipe, action: "save", experiment_id: CONFIG.DATAPIPE_ID,
           filename: `${participantId}_summary.csv`, data_string: () => summaryCsv(info) },
       ]
-    : [{
+    : url.download === undefined ? [] : [{
+        // Testing only: add ?download=1 to the URL to download your own data when no DataPipe ID is set
         type: jsPsychHtmlButtonResponse,
-        stimulus: "<p><b>Test mode:</b> no DataPipe ID is set, so the data will download to this computer.</p>",
+        stimulus: "<p><b>Test mode:</b> download your data.</p>",
         choices: ["Download data"],
         on_finish: () => {
           const blob = (text, name) => {
@@ -231,6 +227,7 @@ async function main() {
   const code = CONFIG.PROLIFIC_COMPLETION_CODE;
   const debrief = {
     type: jsPsychHtmlButtonResponse,
+    on_start: () => document.body.classList.remove("show-verdict-key"),
     stimulus: TEXT.debrief,
     choices: [code ? "Finish and return to Prolific" : "Finish"],
     on_finish: () => {
