@@ -35,7 +35,7 @@ const POSTS = {
           Bella:  "To me this is NTA. YTA feels off because OP opened the callback by saying their son's rudeness wasn't okay, which shows real respect for how the other boy felt. The mother hanging up meant OP's honest attempt to explain both kids' sides never got heard.",
           Nathan: "This reads as NTA. YTA skips the order of events: after the first visit, OP told their son to stay away from the boy outside of class. The next problem happened when the classmate sat across from him at lunch, so the new conflict started with the classmate's choice.",
           Zoe:    "I'm going with NTA. YTA overlooks the lunch detail, where the classmate sat across from OP's son on purpose because he knew it bothered him. OP's toughen-up comment was a response to that specific choice, and pointing out that someone keeps walking into the same situation is fair.",
-          "Mario": "My take is NTA. YTA treats OP's phone call as the problem, but OP was entitled to pass along their own son's account when the mother called with a complaint. Sharing both sides is a normal part of two parents working out a problem between their kids.",
+          "Mario": "My take is NTA. YTA treats OP's phone call as the problem, but OP was entitled to pass along their own son's account when the mother called with a complaint. Sharing both sides is a normal part of two parents working out a problem between their kids."
         },
         // The participant said ESH
         ESH: {
@@ -43,7 +43,7 @@ const POSTS = {
       "Bella": "To me this is NTA. I get why ESH comes up, since the mother hanging up was cold, but OP started the call by admitting their son's rudeness wasn't okay. That kind of honesty about your own kid's behavior is caring toward the other family, not something to count against OP.",
       "Nathan": "This reads as NTA. The mother ending the call was a poor move, but ESH misses how OP handled each step: listening at the first visit, exchanging numbers, talking to their son, then calling back. Every step OP took was aimed at solving the problem rather than adding to it.",
       "Zoe": "I'm going with NTA. The classmate choosing that lunch seat wasn't fair to OP's son, and ESH counts OP's hygiene remark against them, but the point was specifically about eating. Not wanting to smell something unpleasant during a meal is an ordinary reaction, not an insult from OP.",
-      "Mario": "My take is NTA. The mother hanging up was rude, but ESH asks OP to have handled it perfectly, and OP was entitled to report what their son said when she called. Relaying your own kid's account is a reasonable thing for a parent to do, not a wrong.",
+      "Mario": "My take is NTA. The mother hanging up was rude, but ESH asks OP to have handled it perfectly, and OP was entitled to report what their son said when she called. Relaying your own kid's account is a reasonable thing for a parent to do, not a wrong."
         },
         // The participant said NAH
         NAH: {
@@ -51,7 +51,7 @@ const POSTS = {
       "Bella": "To me this is NTA. NAH treats the lunch trouble like bad luck, but the classmate sat across from OP's son because he knew it would bother him. Deliberately setting up a situation that upsets someone else is unkind, even if he was hurt by the insults earlier.",
       "Nathan": "This reads as NTA. NAH assumes things just went wrong, but look at the sequence: OP told their son to keep away, and then the classmate moved toward him at lunch. The second incident followed a step the classmate took after the first one had been handled.",
       "Zoe": "I'm going with NTA. NAH would make sense for the classroom, since the seating there was assigned and nobody chose it. Lunch is different, because the classmate picked the seat across from OP's son himself, so that part was a decision rather than bad luck.",
-      "Mario": "My take is NTA. NAH doesn't account for the mother asking OP to handle their son twice, then hanging up once OP raised her own son's part. Expecting one family to fix things while refusing to consider the other side isn't a mix-up, it's a real failing on her end.",
+      "Mario": "My take is NTA. NAH doesn't account for the mother asking OP to handle their son twice, then hanging up once OP raised her own son's part. Expecting one family to fix things while refusing to consider the other side isn't a mix-up, it's a real failing on her end."
         },
       },
       YTA: {
@@ -94,7 +94,7 @@ const POSTS = {
       "Bella": "To me this is NTA, since the YTA reading skips over how OP was treated first. Getting jabbed toward the road by a stranger's hands feels like being ordered around, not asked. It makes sense OP felt brushed aside, and refusing that kind of demand isn't a cruel thing to do.",
       "Nathan": "This reads as NTA rather than YTA. OP was walking home, the crew was in the way, and OP was the one asked to change course. OP then kept going on the same path they were already on, which is ignoring a demand, not creating a problem.",
       "Zoe": "I'm going with NTA, because the YTA view treats the request as small when it wasn't. The detail that stands out is that OP was pointed onto the road itself. Stepping out where cars drive, even for a few meters, is a real ask, and declining it is reasonable.",
-      "Mario": "I'd call it NTA, since OP's walk doesn't make them the one at fault the way YTA suggests. OP was entitled to use the pavement like anyone else. Filming somewhere public means planning around people passing through, like pausing for a few seconds, rather than sending pedestrians into the road.",
+      "Mario": "I'd call it NTA, since OP's walk doesn't make them the one at fault the way YTA suggests. OP was entitled to use the pavement like anyone else. Filming somewhere public means planning around people passing through, like pausing for a few seconds, rather than sending pedestrians into the road."
         },
         // The participant said ESH
         ESH: {
@@ -102,7 +102,7 @@ const POSTS = {
       "Bella": "I'd say NTA rather than ESH. That aggressive pointing would make most people feel disrespected. The crew might feel annoyed that a take got interrupted, but feeling annoyed isn't the same as being wronged, and OP's reaction to being treated that way stayed pretty mild.",
       "Nathan": "This reads as NTA, not ESH. First the crew member was rude, then OP simply carried on walking. ESH would require OP to have done something extra, like stopping in the shot or starting an argument, and the post describes none of that.",
       "Zoe": "I'm going with NTA over ESH. The detail that matters is where OP was sent, which was the road. Saying no to walking among traffic isn't a fault, so the only one who behaved badly here is the person doing the aggressive pointing.",
-      "Mario": "I'd call it NTA instead of ESH. The crew member was out of line, but OP didn't owe the crew any help with their video. OP was entitled to the pavement, and the crew could have waited a moment for OP to pass instead of treating the walkway as theirs.",
+      "Mario": "I'd call it NTA instead of ESH. The crew member was out of line, but OP didn't owe the crew any help with their video. OP was entitled to the pavement, and the crew could have waited a moment for OP to pass instead of treating the walkway as theirs."
         },
         // The participant said NAH
         NAH: {
@@ -110,7 +110,7 @@ const POSTS = {
       "Bella": "To me this is NTA, not NAH. Being waved toward the road with an aggressive gesture would leave most people feeling small and ignored. That person chose to treat OP that way, and calling it nobody's fault lets them off for how they made OP feel.",
       "Nathan": "This reads as NTA instead of NAH. The crew chose to film on the pavement, and then one of them told OP to leave it for the road. Both steps put the cost on OP, and that pattern is a choice they made, not bad luck.",
       "Zoe": "I'm going with NTA over NAH. What stands out is that the person never asked OP anything and just pointed hard at the road. A polite word would have been easy, so skipping it is rudeness rather than a misunderstanding.",
-      "Mario": "I'd call it NTA, not NAH. The crew had easy options, like pausing for a few seconds while OP walked by. Choosing instead to direct a pedestrian into the road puts their video ahead of OP's safety, and that's on them.",
+      "Mario": "I'd call it NTA, not NAH. The crew had easy options, like pausing for a few seconds while OP walked by. Choosing instead to direct a pedestrian into the road puts their video ahead of OP's safety, and that's on them."
         },
       },
       YTA: {
@@ -120,7 +120,7 @@ const POSTS = {
       "Bella": "To me this is YTA rather than NTA. Only one person made the rude gesture, but walking through the shot spoiled things for the person holding the camera too. They hadn't done anything to OP, and they likely ended up frustrated over a take that got ruined.",
       "Nathan": "This reads as YTA, not NTA. A crew member gestured rudely, and OP responded by walking into the shot to ruin the filming. Each step got worse, and OP was the one who turned a brief rude moment into actual damage to someone's work.",
       "Zoe": "I'm going with YTA over NTA. The detail that sticks out is that the detour was only a few meters. Being asked to step around a shot for a few seconds is a small favour, and OP turned it down in a way that wrecked the filming.",
-      "Mario": "I'd call it YTA instead of NTA. Even if the crew had no right to the pavement, OP had better options, like waiting a moment, speaking up about the rude gesture, or walking behind the camera. Walking straight through the shot was the least fair choice.",
+      "Mario": "I'd call it YTA instead of NTA. Even if the crew had no right to the pavement, OP had better options, like waiting a moment, speaking up about the rude gesture, or walking behind the camera. Walking straight through the shot was the least fair choice."
         },
         // The participant said ESH
         ESH: {
@@ -128,7 +128,7 @@ const POSTS = {
       "Bella": "To me this is YTA rather than ESH. The person gesturing was probably focused on getting the shot and a bit stressed about people walking into it. That makes the abrupt pointing understandable, while OP chose to make the situation worse on purpose.",
       "Nathan": "This reads as YTA instead of ESH. The crew member's gesture was a request, even a rude one, and it cost OP nothing unless OP went along with it. OP's walk through the shot was an action with a real cost, which puts the blame on OP.",
       "Zoe": "I'm going with YTA over ESH. OP says the gesture made them angry, and the post shows that anger led straight to walking in front of the camera. The crew member was abrupt for a moment, but OP acted on purpose to get back at them.",
-      "Mario": "I'd call it YTA, not ESH. Asking people to step around a shot for a moment is a normal request, and blunt delivery doesn't make it wrong. OP was free to say no politely and keep walking, but deliberately walking into the shot went well past that.",
+      "Mario": "I'd call it YTA, not ESH. Asking people to step around a shot for a moment is a normal request, and blunt delivery doesn't make it wrong. OP was free to say no politely and keep walking, but deliberately walking into the shot went well past that."
         },
         // The participant said NAH
         NAH: {
@@ -136,7 +136,7 @@ const POSTS = {
       "Bella": "To me this is YTA, not NAH. Someone was putting effort into that video, and OP walking through the shot likely left them frustrated and set back. Spoiling someone's work because you felt slighted goes past a clash of preferences into being unkind.",
       "Nathan": "This reads as YTA instead of NAH. OP lists two reasons for being annoyed, and then says those reasons are why they walked in front of the camera. That sequence shows a deliberate decision, so it can't be treated as an honest mistake.",
       "Zoe": "I'm going with YTA over NAH. The title itself says OP ruined someone's filming, so OP knew the effect of what they did. Ruining something on purpose crosses a line, even if both sides just wanted to use the same pavement.",
-      "Mario": "I'd call it YTA, not NAH. OP was entitled to refuse the detour and keep walking normally. Deliberately putting themselves in front of the camera is different from refusing, because it goes beyond protecting OP's own space to spoiling the crew's work.",
+      "Mario": "I'd call it YTA, not NAH. OP was entitled to refuse the detour and keep walking normally. Deliberately putting themselves in front of the camera is different from refusing, because it goes beyond protecting OP's own space to spoiling the crew's work."
         },
       },
     },
