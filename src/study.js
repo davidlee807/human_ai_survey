@@ -145,7 +145,7 @@ function discussionBlock(d) {
 }
 
 // One row per participant, ready for analysis.
-function summaryCsv(info) {
+function summaryRow(info) {
   const all = jsPsych.data.get();
   const row = {
     participant_id: participantId, prolific_pid: url.PROLIFIC_PID || "", study_id: url.STUDY_ID || "",
@@ -169,9 +169,39 @@ function summaryCsv(info) {
   });
   row.self_intro = (all.filter({ discussion: 1, measure: "chat" }).values()[0] || {}).self_intro;
   row.total_time_ms = all.last(1).values()[0].time_elapsed;
+  return row;
+}
+
+function summaryCsv(info) {
+  const row = summaryRow(info);
   const keys = Object.keys(row);
   const cell = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
   return keys.join(",") + "\n" + keys.map((k) => cell(row[k])).join(",") + "\n";
+}
+
+// Save one Firestore document per participant: the summary row as fields, plus the
+// full trial-by-trial CSV as text. Uses the Firestore REST API, so no SDK is needed.
+async function saveToFirebase(info) {
+  const fb = CONFIG.FIREBASE;
+  const value = (v) =>
+    v === null || v === undefined ? { nullValue: null }
+    : typeof v === "boolean" ? { booleanValue: v }
+    : typeof v === "number" ? { doubleValue: v }
+    : { stringValue: String(v) };
+  const fields = {};
+  Object.entries(summaryRow(info)).forEach(([k, v]) => { fields[k] = value(v); });
+  fields.trials_csv = value(jsPsych.data.get().csv());
+  fields.saved_at = { timestampValue: new Date().toISOString() };
+  const endpoint = `https://firestore.googleapis.com/v1/projects/${fb.projectId}/databases/(default)/documents/` +
+    `${fb.collection}?documentId=${encodeURIComponent(participantId)}&key=${fb.apiKey}`;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const res = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fields }) });
+      if (res.ok || res.status === 409) return true; // 409: already saved
+    } catch (e) { /* network error, retry */ }
+    await new Promise((r) => setTimeout(r, 1500 * attempt));
+  }
+  return false;
 }
 
 async function main() {
@@ -200,7 +230,27 @@ async function main() {
   };
   const instructions = { type: jsPsychHtmlButtonResponse, stimulus: TEXT.instructions, choices: ["Start"] };
 
-  const save = ON_COGNITION ? [] : CONFIG.DATAPIPE_ID
+  const firebaseSave = {
+    type: jsPsychHtmlButtonResponse,
+    stimulus: "<p>Saving your responses, please wait...</p>",
+    choices: [],
+    data: { measure: "save" },
+    on_load: async () => {
+      const ok = await saveToFirebase(info);
+      if (ok) jsPsych.finishTrial({ saved: true });
+      else jsPsych.getDisplayElement().innerHTML = `<p>Sorry, we could not save your responses.
+        Please check your internet connection and try again.</p>
+        <button class="jspsych-btn" id="retry-save">Try again</button>`;
+      const retry = document.getElementById("retry-save");
+      if (retry) retry.addEventListener("click", async () => {
+        retry.disabled = true;
+        if (await saveToFirebase(info)) jsPsych.finishTrial({ saved: true });
+        else retry.disabled = false;
+      });
+    },
+  };
+
+  const save = ON_COGNITION ? [] : CONFIG.FIREBASE.apiKey ? [firebaseSave] : CONFIG.DATAPIPE_ID
     ? [
         { type: jsPsychPipe, action: "save", experiment_id: CONFIG.DATAPIPE_ID,
           filename: `${participantId}_trials.csv`, data_string: () => jsPsych.data.get().csv() },

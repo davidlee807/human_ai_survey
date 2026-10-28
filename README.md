@@ -44,6 +44,18 @@ The first chat opens with introductions: the Host welcomes everyone, each agent 
 
 A reminder of what YTA, NTA, ESH and NAH mean stays at the top of the page from the first post on. The 2nd and 4th agents open with "I agree with <previous agent>." (`AGREE_PREFIX` in `src/content.js`). The explanation after the verdict is optional.
 
+## Saving responses (Firebase)
+
+When `CONFIG.FIREBASE.apiKey` is set, each participant's data is saved at the end as one document in the Firestore collection `responses` (document ID = Prolific ID or a random ID). The document holds the summary row as fields plus the full trial CSV in `trials_csv`. Participants see "Saving your responses..." and a "Try again" button if the save fails.
+
+1. Create a project at https://console.firebase.google.com (Google Analytics not needed).
+2. Build → Firestore Database → Create database (production mode, any location).
+3. Firestore → Rules: paste `firestore.rules` from this repo and Publish.
+4. Project settings → Your apps → add a Web app. Copy `apiKey` and `projectId` into `CONFIG.FIREBASE` in `src/config.js`.
+5. To download the data: `pip install firebase-admin`, save a service-account key (Project settings → Service accounts → Generate new private key) as `tools/service-account.json`, and run `python tools/export_responses.py`. It writes `data/summary.csv` and `data/trials/<id>.csv`. Never commit the key.
+
+Without DataPipe, participants are assigned to one of the 8 cells at random rather than in strict balance.
+
 ## Data
 
 Two CSV files are saved for each participant:

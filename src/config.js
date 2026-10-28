@@ -1,5 +1,16 @@
 // Study settings. Edit these before going live.
 const CONFIG = {
+  // Firebase (Firestore) project that stores the responses. Copy these two values
+  // from Firebase console > Project settings > Your apps > Web app config.
+  // They are safe to publish: the security rules (firestore.rules) only let
+  // participants add new responses, never read or change them.
+  // Leave apiKey empty to turn Firebase saving off.
+  FIREBASE: {
+    apiKey: "",
+    projectId: "",
+    collection: "responses",
+  },
+
   // DataPipe experiment ID from https://pipe.jspsych.org.
   // Leave empty while testing: the data then downloads as a CSV at the end.
   DATAPIPE_ID: "",
