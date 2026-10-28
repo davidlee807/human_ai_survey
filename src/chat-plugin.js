@@ -79,15 +79,15 @@ var jsPsychChat = (function (jspsych) {
       const answer = (key, value, said) => {
         responses[key] = value;
         inputArea.innerHTML = "";
-        addSelf(said);
+        if (said) addSelf(said); // a blank reply (allowed when min_chars is 0) adds no bubble
         later(next, t.pause_after_message);
       };
 
       const askText = (s) => {
-        inputArea.innerHTML = `<input type="text" class="chat-text" placeholder="${escapeHtml(s.placeholder || "Type your message...")}" maxlength="${s.max_chars || 300}"><button class="jspsych-btn chat-send" disabled>Send</button>`;
+        inputArea.innerHTML = `<input type="text" class="chat-text" placeholder="${escapeHtml(s.placeholder || "Type your message...")}" maxlength="${s.max_chars || 300}"><button class="jspsych-btn chat-send"${(s.min_chars ?? 2) > 0 ? " disabled" : ""}>Send</button>`;
         const field = inputArea.querySelector(".chat-text");
         const send = inputArea.querySelector(".chat-send");
-        const ok = () => field.value.trim().length >= (s.min_chars || 2);
+        const ok = () => field.value.trim().length >= (s.min_chars ?? 2);
         field.addEventListener("input", () => { send.disabled = !ok(); });
         const submit = () => { if (ok()) answer(s.key, field.value.trim(), field.value.trim()); };
         send.addEventListener("click", submit);

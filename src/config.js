@@ -1,5 +1,10 @@
 // Study settings. Edit these before going live.
 const CONFIG = {
+  // Google Apps Script web app URL that writes responses into your Google Sheet
+  // (see google/Code.gs and the README). Looks like
+  // https://script.google.com/macros/s/AKfy.../exec . Leave empty to turn it off.
+  GOOGLE_SHEETS_URL: "",
+
   // DataPipe experiment ID from https://pipe.jspsych.org.
   // Leave empty while testing: the data then downloads as a CSV at the end.
   DATAPIPE_ID: "",

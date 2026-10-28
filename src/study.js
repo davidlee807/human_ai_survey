@@ -62,12 +62,13 @@ function discussionScript(postId, condition) {
     host(HOST_LINES.ask_verdict),
     { input: "choice", key: "verdict", choices: VERDICTS.map((v) => ({ label: v.label, value: v.code, say: v.code })) },
     host(HOST_LINES.ask_explanation),
-    { input: "text", key: "explanation", placeholder: HOST_LINES.explanation_placeholder, min_chars: 10, max_chars: 600 },
+    { input: "text", key: "explanation", placeholder: HOST_LINES.explanation_placeholder, min_chars: 0, max_chars: 600 },
     (r) => {
       r.agent_verdict = agentVerdictFor(r.verdict);
-      const agentMsgs = AGENTS.map((a) => ({
+      const agentMsgs = AGENTS.map((a, i) => ({
         name: a.name, color: a.color, role: "agent",
-        text: POSTS[postId].agent_messages[r.agent_verdict][r.verdict][a.name],
+        text: (i === 1 || i === 3 ? AGREE_PREFIX.replace("{name}", AGENTS[i - 1].name) : "") +
+          POSTS[postId].agent_messages[r.agent_verdict][r.verdict][a.name],
       }));
       if (condition === "baseline") return [host(HOST_LINES.neutral), ...agentMsgs];
       if (condition === "preemptive") return [host(HOST_LINES.preemptive), ...agentMsgs];
@@ -84,6 +85,7 @@ function discussionBlock(d) {
 
   const read = {
     type: jsPsychHtmlButtonResponse,
+    on_start: () => document.body.classList.add("show-verdict-key"),
     stimulus: `<p class="step">Post ${d.n} of 2</p>${postHtml(post)}<p>${TEXT.read_post}</p>`,
     choices: ["Go to the group chat"],
     data: { ...tag, measure: "read_post" },
@@ -139,18 +141,11 @@ function discussionBlock(d) {
     },
   };
 
-  const manipulation = {
-    type: jsPsychSurveyMultiChoice,
-    questions: [{ name: "manip", prompt: MANIPULATION_CHECK.prompt, options: MANIPULATION_CHECK.options, required: true }],
-    data: { ...tag, measure: "manipulation_check" },
-    on_finish: (data) => { data.manip_answer = data.response.manip; },
-  };
-
-  return [read, chat, threat, final, manipulation];
+  return [read, chat, threat, final];
 }
 
 // One row per participant, ready for analysis.
-function summaryCsv(info) {
+function summaryRow(info) {
   const all = jsPsych.data.get();
   const row = {
     participant_id: participantId, prolific_pid: url.PROLIFIC_PID || "", study_id: url.STUDY_ID || "",
@@ -170,17 +165,42 @@ function summaryCsv(info) {
     row[`d${n}_verdict_changed`] = f.verdict_changed;
     THREAT_ITEMS.forEach((q) => { row[`d${n}_${q.name}`] = th[q.name]; });
     row[`d${n}_threat_mean`] = th.threat_mean;
-    row[`d${n}_manip`] = get("manipulation_check").manip_answer;
     if (n === 2) row.attention_pass = th.attention_pass;
   });
   row.self_intro = (all.filter({ discussion: 1, measure: "chat" }).values()[0] || {}).self_intro;
   row.total_time_ms = all.last(1).values()[0].time_elapsed;
+  return row;
+}
+
+function summaryCsv(info) {
+  const row = summaryRow(info);
   const keys = Object.keys(row);
   const cell = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
   return keys.join(",") + "\n" + keys.map((k) => cell(row[k])).join(",") + "\n";
 }
 
+// Send the participant's data to the Google Apps Script web app, which adds one row
+// to the "summary" sheet and one row per screen to the "trials" sheet.
+// Apps Script doesn't allow reading the reply from another site ("no-cors"), so a
+// request that goes out without a network error counts as saved; the script
+// ignores a participant ID it has already stored, so a retry can't duplicate rows.
+async function saveToGoogleSheets(info) {
+  const flat = (v) => (v !== null && typeof v === "object" ? JSON.stringify(v) : v);
+  const trials = jsPsych.data.get().values().map((t) =>
+    Object.fromEntries(Object.entries(t).map(([k, v]) => [k, flat(v)])));
+  const body = JSON.stringify({ summary: summaryRow(info), trials });
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      await fetch(CONFIG.GOOGLE_SHEETS_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body });
+      return true;
+    } catch (e) { /* network error, retry */ }
+    await new Promise((r) => setTimeout(r, 1500 * attempt));
+  }
+  return false;
+}
+
 async function main() {
+  document.body.insertAdjacentHTML("afterbegin", `<div class="verdict-key">${TEXT.verdict_key}</div>`);
   const info = decodeCell(await getCell());
   const secondPost = info.firstPost === "A" ? "B" : "A";
   const discussions = [
@@ -205,16 +225,37 @@ async function main() {
   };
   const instructions = { type: jsPsychHtmlButtonResponse, stimulus: TEXT.instructions, choices: ["Start"] };
 
-  const save = ON_COGNITION ? [] : CONFIG.DATAPIPE_ID
+  const sheetsSave = {
+    type: jsPsychHtmlButtonResponse,
+    stimulus: "<p>Saving your responses, please wait...</p>",
+    choices: [],
+    data: { measure: "save" },
+    on_load: async () => {
+      const ok = await saveToGoogleSheets(info);
+      if (ok) jsPsych.finishTrial({ saved: true });
+      else jsPsych.getDisplayElement().innerHTML = `<p>Sorry, we could not save your responses.
+        Please check your internet connection and try again.</p>
+        <button class="jspsych-btn" id="retry-save">Try again</button>`;
+      const retry = document.getElementById("retry-save");
+      if (retry) retry.addEventListener("click", async () => {
+        retry.disabled = true;
+        if (await saveToGoogleSheets(info)) jsPsych.finishTrial({ saved: true });
+        else retry.disabled = false;
+      });
+    },
+  };
+
+  const save = ON_COGNITION ? [] : CONFIG.GOOGLE_SHEETS_URL ? [sheetsSave] : CONFIG.DATAPIPE_ID
     ? [
         { type: jsPsychPipe, action: "save", experiment_id: CONFIG.DATAPIPE_ID,
           filename: `${participantId}_trials.csv`, data_string: () => jsPsych.data.get().csv() },
         { type: jsPsychPipe, action: "save", experiment_id: CONFIG.DATAPIPE_ID,
           filename: `${participantId}_summary.csv`, data_string: () => summaryCsv(info) },
       ]
-    : [{
+    : url.download === undefined ? [] : [{
+        // Testing only: add ?download=1 to the URL to download your own data when no DataPipe ID is set
         type: jsPsychHtmlButtonResponse,
-        stimulus: "<p><b>Test mode:</b> no DataPipe ID is set, so the data will download to this computer.</p>",
+        stimulus: "<p><b>Test mode:</b> download your data.</p>",
         choices: ["Download data"],
         on_finish: () => {
           const blob = (text, name) => {
@@ -231,6 +272,7 @@ async function main() {
   const code = CONFIG.PROLIFIC_COMPLETION_CODE;
   const debrief = {
     type: jsPsychHtmlButtonResponse,
+    on_start: () => document.body.classList.remove("show-verdict-key"),
     stimulus: TEXT.debrief,
     choices: [code ? "Finish and return to Prolific" : "Finish"],
     on_finish: () => {

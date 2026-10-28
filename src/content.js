@@ -143,6 +143,10 @@ const POSTS = {
   },
 };
 
+// The 2nd and 4th agents open by agreeing with the agent who spoke just before
+// them. {name} is replaced by that agent's name. Set to "" to turn this off.
+const AGREE_PREFIX = "I agree with {name}. ";
+
 // The opening of the group chat, shown once at the start of the first chat (after the first post).
 const INTRO_LINES = {
   welcome: "Welcome! We'll be discussing posts from Reddit's \"Am I the Asshole?\" community, starting with the one you just read. Before we start, let's all introduce ourselves!",
@@ -156,7 +160,7 @@ const HOST_LINES = {
   ask_verdict: "Having read the post, what is your verdict: YTA (You're the Asshole), NTA (Not the Asshole), ESH (Everyone Sucks Here), or NAH (No Assholes Here)?",
   // Asked right after the verdict; the participant types a sentence or two
   ask_explanation: "Could you briefly explain your verdict in a sentence or two?",
-  explanation_placeholder: "Explain your verdict in a sentence or two...",
+  explanation_placeholder: "Explain your verdict in a sentence or two (optional)...",
   // Baseline: neutral line, shown after the verdict and before the agents
   neutral: "Here is what the agents think about this post.",
   // Group 1: freedom-restoring line, shown after the verdict and before the agents
@@ -191,11 +195,6 @@ const ATTENTION_CHECK = {
   correct: 4,
 };
 
-const MANIPULATION_CHECK = {
-  prompt: "In this discussion, did the Host say it was okay for you to disagree with the agents?",
-  options: ["Yes", "No", "I don't remember"],
-};
-
 const TEXT = {
   consent: `<h2>[PLACEHOLDER] Consent</h2>
     <p>[PLACEHOLDER] Study purpose, what participants will do, about how long it takes,
@@ -208,7 +207,9 @@ const TEXT = {
     verdict, explain it in a sentence or two, read what the agents think, and answer a
     few questions.</p>`,
   read_post: "Please read this post carefully. You will give your verdict in the group chat next.",
-  debrief: `<h2>[PLACEHOLDER] Debrief</h2>
-    <p>[PLACEHOLDER] Explain that the agents' messages were written in advance and always
-    disagreed with your first verdict, why this was done, and who to contact with questions.</p>`,
+  debrief: `<h2>Thank you!</h2>
+    <p>Thank you for participating in the survey.</p>`,
+  // Shown at the top of every page from the first post on, as a reminder of the verdicts
+  verdict_key: `<b>YTA</b> You're the Asshole · <b>NTA</b> Not the Asshole ·
+    <b>ESH</b> Everyone Sucks Here · <b>NAH</b> No Assholes Here`,
 };
