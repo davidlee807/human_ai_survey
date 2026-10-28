@@ -9,12 +9,18 @@
 // New columns are added automatically. A participant ID that is already in
 // "summary" is ignored, so a repeated send can't create duplicate rows.
 
+// If this script was created from a Google Form or on its own (script.google.com),
+// paste the ID of the Google Sheet to write to here. It is the long code in the
+// Sheet's address: docs.google.com/spreadsheets/d/THIS_PART/edit
+// Leave it empty if you created the script from the Sheet (Extensions > Apps Script).
+const SHEET_ID = "";
+
 function doPost(e) {
   const lock = LockService.getScriptLock();
   lock.waitLock(30000);
   try {
     const data = JSON.parse(e.postData.contents);
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const ss = SHEET_ID ? SpreadsheetApp.openById(SHEET_ID) : SpreadsheetApp.getActiveSpreadsheet();
     const id = String(data.summary.participant_id);
     const summary = getSheet_(ss, "summary");
     if (summary.getLastRow() > 1) {
