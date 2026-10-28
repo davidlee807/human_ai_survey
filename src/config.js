@@ -21,8 +21,8 @@ const CONFIG = {
   // Live-typing feel for the chat. All times are in milliseconds.
   TYPING: {
     first_delay: 800,            // pause before the first message starts
-    indicator_min: 4000,         // "..." typing dots are shown for between these
-    indicator_max: 4000,         //   two durations (both 4000 = always 4 s); set them
+    indicator_min: 2000,         // "..." typing dots are shown for between these
+    indicator_max: 2000,         //   two durations (both 2000 = always 2 s); set them
     indicator_ms_per_char: 15,   //   apart to scale with message length x this
     pause_after_message: 0,      // gap after a Host or agent message before the next one starts typing
     pause_after_reply: 700,      // gap after the participant answers before the Host replies
