@@ -22,15 +22,11 @@ const HOST = { name: "Host", color: "#333333" };
 const POSTS = {
   A: {
     title: "AITA for telling a mother that maybe her teenage son needs to toughen up?",
-    body: `<p>Earlier in the week the mother of one of my son’s classmates came over to discuss a problem between our boys. I guess my son has been telling her son that he stinks, is gross, and so on. I told her I would talk to my son about it and we exchanged numbers in case there were any other problems.
-
-I talked to my son and he didn’t deny it. He says the boy does smell really bad and is assigned to sit next to him in one of their classes. I told him to just try to ignore it and just stay away from him otherwise.
-
-Last night I got a call from the classmate’s mother saying that my son had picked on her’s again during lunch and that he was upset again. I confronted my son about it and he said that her son has been purposely sitting across from him at lunch because he knows that it bothers my son.
-
-I called the classmate’s mother back and told her what my son had said. I told her that it’s not ok that my son was rude, but to be fair no one wants to smell bad hygiene while they’re trying to eat. And also if her son was going to go out of his way to put himself in that position then maybe he should toughen up a bit.
-
-She just hung up on me. I don’t condone bullying and have talked to my son about it again, but at the same time I don’t feel my viewpoint on it is all that ridiculous.</p>`,
+    body: `<p>Earlier in the week the mother of one of my son’s classmates came over to discuss a problem between our boys. I guess my son has been telling her son that he stinks, is gross, and so on. I told her I would talk to my son about it and we exchanged numbers in case there were any other problems.</p>
+      <p>I talked to my son and he didn’t deny it. He says the boy does smell really bad and is assigned to sit next to him in one of their classes. I told him to just try to ignore it and just stay away from him otherwise.</p>
+      <p>Last night I got a call from the classmate’s mother saying that my son had picked on her’s again during lunch and that he was upset again. I confronted my son about it and he said that her son has been purposely sitting across from him at lunch because he knows that it bothers my son.</p>
+      <p>I called the classmate’s mother back and told her what my son had said. I told her that it’s not ok that my son was rude, but to be fair no one wants to smell bad hygiene while they’re trying to eat. And also if her son was going to go out of his way to put himself in that position then maybe he should toughen up a bit.</p>
+      <p>She just hung up on me. I don’t condone bullying and have talked to my son about it again, but at the same time I don’t feel my viewpoint on it is all that ridiculous.</p>`,
     agent_messages: {
       NTA: {
         // The participant said YTA
@@ -102,7 +98,7 @@ She just hung up on me. I don’t condone bullying and have talked to my son abo
         },
         // The participant said ESH
         ESH: {
-          Cody:   "Cody": "I think it's NTA, not ESH. The person pointing at the road was rude, no argument there. But OP walking past a camera on a public pavement isn't a wrong on their side. OP just went where they were already going and didn't do anything beyond that.",
+          Cody:   "I think it's NTA, not ESH. The person pointing at the road was rude, no argument there. But OP walking past a camera on a public pavement isn't a wrong on their side. OP just went where they were already going and didn't do anything beyond that.",
       "Bella": "I'd say NTA rather than ESH. That aggressive pointing would make most people feel disrespected. The crew might feel annoyed that a take got interrupted, but feeling annoyed isn't the same as being wronged, and OP's reaction to being treated that way stayed pretty mild.",
       "Nathan": "This reads as NTA, not ESH. First the crew member was rude, then OP simply carried on walking. ESH would require OP to have done something extra, like stopping in the shot or starting an argument, and the post describes none of that.",
       "Zoe": "I'm going with NTA over ESH. The detail that matters is where OP was sent, which was the road. Saying no to walking among traffic isn't a fault, so the only one who behaved badly here is the person doing the aggressive pointing.",
