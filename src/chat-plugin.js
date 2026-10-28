@@ -1,5 +1,5 @@
 // A jsPsych trial that plays a pre-written group chat as if it were live:
-// a typing indicator appears, then each message streams in, one speaker at a time.
+// a typing indicator appears, then each message appears in full, one speaker at a time.
 // The script can pause for the participant to type a message or click a button.
 var jsPsychChat = (function (jspsych) {
   "use strict";
@@ -35,7 +35,7 @@ var jsPsychChat = (function (jspsych) {
 
     trial(display_element, trial) {
       const t = Object.assign(
-        { first_delay: 800, indicator_min: 900, indicator_max: 2200, ms_per_char: 28, pause_after_message: 700 },
+        { first_delay: 800, indicator_min: 1200, indicator_max: 3500, indicator_ms_per_char: 15, pause_after_message: 3000, pause_after_reply: 700 },
         trial.typing
       );
       const start = performance.now();
@@ -80,7 +80,7 @@ var jsPsychChat = (function (jspsych) {
         responses[key] = value;
         inputArea.innerHTML = "";
         if (said) addSelf(said); // a blank reply (allowed when min_chars is 0) adds no bubble
-        later(next, t.pause_after_message);
+        later(next, t.pause_after_reply);
       };
 
       const askText = (s) => {
@@ -106,19 +106,12 @@ var jsPsychChat = (function (jspsych) {
       const say = (m) => {
         const textEl = addRow(m);
         shown.push({ name: m.name, text: m.text });
-        const indicator = Math.min(t.indicator_max, Math.max(t.indicator_min, m.text.length * 15));
+        const indicator = Math.min(t.indicator_max, Math.max(t.indicator_min, m.text.length * t.indicator_ms_per_char));
+        // Show the typing dots, then the whole message at once
         later(() => {
-          // Stream the text a few characters at a time
-          textEl.textContent = "";
-          let pos = 0;
-          const step = () => {
-            pos = Math.min(m.text.length, pos + 2);
-            textEl.textContent = m.text.slice(0, pos);
-            scroll();
-            if (pos < m.text.length) later(step, t.ms_per_char * 2);
-            else later(next, t.pause_after_message);
-          };
-          step();
+          textEl.textContent = m.text;
+          scroll();
+          later(next, t.pause_after_message);
         }, indicator);
       };
 
