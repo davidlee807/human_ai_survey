@@ -13,11 +13,6 @@ const CONFIG = {
   // a plain "thank you" page instead of redirecting.
   PROLIFIC_COMPLETION_CODE: "",
 
-  // Counterbalancing. Cells are: group (preemptive / post) x which post comes
-  // first (A / B), and optionally x whether the baseline is Discussion 1 or 2.
-  // In DataPipe, set the number of conditions to 8 if this is true, 4 if false.
-  COUNTERBALANCE_BASELINE_POSITION: true,
-
   // Live-typing feel for the chat. All times are in milliseconds.
   TYPING: {
     first_delay: 800,            // pause before the first message starts

@@ -6,14 +6,14 @@ const jsPsych = initJsPsych({
 
 const url = jsPsych.data.urlVariables();
 const participantId = url.PROLIFIC_PID || jsPsych.randomization.randomID(10);
-const N_CELLS = CONFIG.COUNTERBALANCE_BASELINE_POSITION ? 8 : 4;
+const N_CELLS = 4;
 // On Cognition.run the platform saves the data and assigns a balanced CONDITION itself.
 const ON_COGNITION = typeof CONDITION !== "undefined" || location.hostname.endsWith("cognition.run");
 // The verdict the agents argue: YTA -> NTA, NTA -> YTA, and ESH or NAH -> YTA or NTA at random.
 const agentVerdictFor = (v) =>
   v === "YTA" ? "NTA" : v === "NTA" ? "YTA" : jsPsych.randomization.sampleWithoutReplacement(["YTA", "NTA"], 1)[0];
 
-// Balanced assignment through DataPipe if set up; "?cell=0..7" in the URL forces a cell for testing.
+// Balanced assignment through DataPipe if set up; "?cell=0..3" in the URL forces a cell for testing.
 async function getCell() {
   if (url.cell !== undefined) return Number(url.cell) % N_CELLS;
   if (typeof CONDITION !== "undefined" && !isNaN(Number(CONDITION))) {
@@ -26,11 +26,12 @@ async function getCell() {
   return Math.floor(Math.random() * N_CELLS);
 }
 
+// Cells are group (preemptive / post) x which post comes first (A / B).
+// The baseline is always Discussion 1, so the second discussion carries the group's condition.
 function decodeCell(cell) {
   const group = cell % 2 === 0 ? "preemptive" : "post";
   const firstPost = Math.floor(cell / 2) % 2 === 0 ? "A" : "B";
-  const baselinePosition = N_CELLS === 8 && Math.floor(cell / 4) % 2 === 1 ? 2 : 1;
-  return { cell, group, firstPost, baselinePosition };
+  return { cell, group, firstPost };
 }
 
 function postHtml(post) {
@@ -150,7 +151,7 @@ function summaryRow(info) {
   const row = {
     participant_id: participantId, prolific_pid: url.PROLIFIC_PID || "", study_id: url.STUDY_ID || "",
     session_id: url.SESSION_ID || "", cell: info.cell, group: info.group,
-    first_post: info.firstPost, baseline_position: info.baselinePosition,
+    first_post: info.firstPost,
   };
   [1, 2].forEach((n) => {
     const get = (measure) => all.filter({ discussion: n, measure }).values()[0] || {};
@@ -204,14 +205,14 @@ async function main() {
   const info = decodeCell(await getCell());
   const secondPost = info.firstPost === "A" ? "B" : "A";
   const discussions = [
-    { n: 1, postId: info.firstPost, condition: info.baselinePosition === 1 ? "baseline" : info.group },
-    { n: 2, postId: secondPost, condition: info.baselinePosition === 2 ? "baseline" : info.group },
+    { n: 1, postId: info.firstPost, condition: "baseline" },
+    { n: 2, postId: secondPost, condition: info.group },
   ];
 
   jsPsych.data.addProperties({
     participant_id: participantId, prolific_pid: url.PROLIFIC_PID || "", study_id: url.STUDY_ID || "",
     session_id: url.SESSION_ID || "", cell: info.cell, group: info.group,
-    first_post: info.firstPost, baseline_position: info.baselinePosition,
+    first_post: info.firstPost,
   });
 
   const consent = {

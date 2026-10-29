@@ -21,20 +21,16 @@ In every condition the discussion chat opens with the Host asking for the partic
 | preemptive (Group 1) | Host freedom-restoring line, then the 5 agents |
 | post (Group 2) | the 5 agents, then the Host freedom-restoring line |
 
-Each participant is put into one of 8 cells: group (preemptive / post) × which post comes first (A / B) × whether the baseline is Discussion 1 or 2. Set `COUNTERBALANCE_BASELINE_POSITION: false` to always make Discussion 1 the baseline (that leaves 4 cells).
+Every participant does the baseline first: Discussion 1 is always the baseline, and Discussion 2 uses the participant's group (preemptive or post). Each participant is put into one of 4 cells: group (preemptive / post) × which post comes first (A / B).
 
-| cell | group | first post | baseline is |
+| cell | group | first post (baseline) | second post (group condition) |
 |---|---|---|---|
-| 0 | preemptive | A | Disc 1 |
-| 1 | post | A | Disc 1 |
-| 2 | preemptive | B | Disc 1 |
-| 3 | post | B | Disc 1 |
-| 4 | preemptive | A | Disc 2 |
-| 5 | post | A | Disc 2 |
-| 6 | preemptive | B | Disc 2 |
-| 7 | post | B | Disc 2 |
+| 0 | preemptive | A | B |
+| 1 | post | A | B |
+| 2 | preemptive | B | A |
+| 3 | post | B | A |
 
-To test a specific cell, add `?cell=5` to the URL.
+To test a specific cell, add `?cell=3` to the URL.
 
 ## Flow
 
@@ -56,7 +52,7 @@ When `CONFIG.GOOGLE_SHEETS_URL` is set, each participant's data is sent at the e
 
 The URL only lets the page add rows; it can't read your Sheet. Anyone who finds it could send junk rows, so check `participant_id` / `prolific_pid` against Prolific when you analyse.
 
-Without DataPipe, participants are assigned to one of the 8 cells at random rather than in strict balance.
+Without DataPipe, participants are assigned to one of the 4 cells at random rather than in strict balance.
 
 ## Data
 
@@ -68,7 +64,7 @@ If no DataPipe ID is set, nothing is saved. For testing, add `?download=1` to th
 
 ## Going live (free)
 
-1. **DataPipe + OSF:** make an OSF project, then sign in at https://pipe.jspsych.org, connect OSF, and create an experiment. Turn on data collection, and turn on condition assignment with 8 conditions (or 4). Paste the experiment ID into `src/config.js`.
+1. **DataPipe + OSF:** make an OSF project, then sign in at https://pipe.jspsych.org, connect OSF, and create an experiment. Turn on data collection, and turn on condition assignment with 4 conditions. Paste the experiment ID into `src/config.js`.
 2. **GitHub Pages:** create a public repo, upload this whole folder, then go to Settings → Pages → deploy from the main branch. Your study URL will be `https://<user>.github.io/<repo>/`.
 3. **Prolific:** set the study URL to
    `https://<user>.github.io/<repo>/?PROLIFIC_PID={{%PROLIFIC_PID%}}&STUDY_ID={{%STUDY_ID%}}&SESSION_ID={{%SESSION_ID%}}`
@@ -80,9 +76,9 @@ If no DataPipe ID is set, nothing is saved. For testing, add `?download=1` to th
 Cognition.run hosts the study and saves the data, so you don't need GitHub Pages or DataPipe. The free plan allows 60 completed runs per task, so check that's enough for your sample. A paid plan raises the limit.
 
 1. Create a task: go to Tasks → **+New task**. If the task settings let you pick a jsPsych version, choose the newest. The code works with 7.3 and 8.
-2. In the task settings, set the number of conditions to **8** (or 4 if `COUNTERBALANCE_BASELINE_POSITION` is false). Cognition spreads participants evenly across them, and the study maps condition 1–8 to cells 0–7 in the table above.
+2. In the task settings, set the number of conditions to **4**. Cognition spreads participants evenly across them, and the study maps condition 1–4 to cells 0–3 in the table above.
 3. Upload `cognition/style.css` as an external library (CSS).
 4. Open **Source code** and paste in all of `cognition/task.js`. The posts and messages are in the `src/content.js` section of that file, so you can edit them right there. Or edit `src/` and run `sh cognition/build.sh` to regenerate the file.
-5. Use the preview's **Set condition** option to check each of the 8 conditions.
+5. Use the preview's **Set condition** option to check each of the 4 conditions.
 6. In Prolific, set the study URL to `<your task URL>?PROLIFIC_PID={{%PROLIFIC_PID%}}&STUDY_ID={{%STUDY_ID%}}&SESSION_ID={{%SESSION_ID%}}`, and put your completion code in the `CONFIG` section. At the end, participants get a "Return to Prolific" button.
 7. Download the data from the task's dashboard as CSV. You get one row per screen. The `final_verdict` rows have `changed_to_agents`, and the `threat` rows have `threat_mean`. (The one-row summary file is only made in the GitHub Pages + DataPipe setup.)
