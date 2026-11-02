@@ -3,9 +3,7 @@
 // file, then Deploy > New deployment > Web app (Execute as: Me, Who has access:
 // Anyone). Copy the web app URL into GOOGLE_SHEETS_URL in src/config.js.
 //
-// Writes two tabs, created on first use:
-//   summary  one row per participant (ready for analysis)
-//   trials   one row per screen, for every participant
+// Writes one row per participant to the "summary" tab (created on first use).
 // New columns are added automatically. A participant ID that is already in
 // "summary" is ignored, so a repeated send can't create duplicate rows.
 
@@ -31,7 +29,6 @@ function doPost(e) {
       }
     }
     appendRows_(summary, [Object.assign({ received_at: new Date() }, data.summary)]);
-    appendRows_(getSheet_(ss, "trials"), data.trials || []);
     return reply_("ok");
   } finally {
     lock.releaseLock();
