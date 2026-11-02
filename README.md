@@ -42,7 +42,7 @@ A reminder of what YTA, NTA, ESH and NAH mean stays at the top of the page from 
 
 ## Saving responses (Google Sheets)
 
-When `CONFIG.GOOGLE_SHEETS_URL` is set, each participant's data is sent at the end to a small Google Apps Script (`google/Code.gs`) that writes it into your Google Sheet: one row per participant in the `summary` tab, and one row per screen in the `trials` tab. Participants see "Saving your responses..." and a "Try again" button if the send fails.
+When `CONFIG.GOOGLE_SHEETS_URL` is set, each participant's data is sent at the end to a small Google Apps Script (`google/Code.gs`) that writes it into your Google Sheet as one row per participant in the `summary` tab (see the column list below). The page HTML and screen-by-screen log are not sent. Participants see "Saving your responses..." and a "Try again" button if the send fails.
 
 1. Create a new Google Sheet (sheets.new).
 2. Extensions → Apps Script. Delete what's there, paste all of `google/Code.gs`, and click Save.
@@ -57,7 +57,7 @@ Without DataPipe, participants are assigned to one of the 4 cells at random rath
 ## Data
 
 Two CSV files are saved for each participant:
-- `<id>_summary.csv`: one row with group, cell, and for each discussion the post, condition, initial and final verdict, the agents' verdict, `changed` (final verdict is the one the agents argued), `verdict_changed` (any change of verdict), the four threat items, the threat mean, plus `attention_pass`, `self_intro` (the sentence the participant typed), and each discussion's `explanation`. Stack these files for the analysis.
+- `<id>_summary.csv`: one row with group, cell, and for each discussion the post, condition, initial and final verdict, the agents' verdict, `changed` (final verdict is the one the agents argued), `verdict_changed` (any change of verdict), the four threat items, the threat mean, plus `attention_pass`, `self_intro` (the sentence the participant typed), and each discussion's `explanation`. Timing (all in ms): `consent_ms`, `instructions_ms`, and per discussion `read_post_ms`, `chat_ms`, `threat_ms`, `final_verdict_ms`, plus `total_time_ms`, `started_at`, `finished_at`. Also `is_mobile` and per discussion `tab_switches` (times the participant left the tab). This is the same row the Google Sheet gets. Stack these files for the analysis.
 - `<id>_trials.csv`: every screen with timestamps, response times, and the exact chat messages that were shown.
 
 If no DataPipe ID is set, nothing is saved. For testing, add `?download=1` to the URL and both files download at the end.

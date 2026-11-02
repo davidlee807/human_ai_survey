@@ -145,21 +145,28 @@ function discussionBlock(d) {
   return [read, chat, threat, final];
 }
 
-// One row per participant, ready for analysis.
+// One row per participant, ready for analysis. This is all that goes to the Google Sheet.
+// Times are in milliseconds.
 function summaryRow(info) {
   const all = jsPsych.data.get();
+  const one = (filter) => all.filter(filter).values()[0] || {};
   const row = {
     participant_id: participantId, prolific_pid: url.PROLIFIC_PID || "", study_id: url.STUDY_ID || "",
     session_id: url.SESSION_ID || "", cell: info.cell, group: info.group,
     first_post: info.firstPost,
+    started_at: one({ measure: "consent" }).timestamp,
+    finished_at: new Date().toISOString(),
+    is_mobile: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent),
+    consent_ms: one({ measure: "consent" }).rt,
+    instructions_ms: one({ measure: "instructions" }).rt,
   };
   [1, 2].forEach((n) => {
-    const get = (measure) => all.filter({ discussion: n, measure }).values()[0] || {};
-    const f = get("final_verdict"), th = get("threat");
+    const get = (measure) => one({ discussion: n, measure });
+    const r = get("read_post"), c = get("chat"), th = get("threat"), f = get("final_verdict");
     row[`d${n}_post`] = f.post_id;
     row[`d${n}_condition`] = f.condition;
     row[`d${n}_initial`] = f.initial_verdict;
-    row[`d${n}_explanation`] = get("chat").explanation;
+    row[`d${n}_explanation`] = c.explanation;
     row[`d${n}_agent_verdict`] = f.agent_verdict;
     row[`d${n}_final`] = f.verdict;
     row[`d${n}_changed`] = f.changed_to_agents;
@@ -167,8 +174,16 @@ function summaryRow(info) {
     THREAT_ITEMS.forEach((q) => { row[`d${n}_${q.name}`] = th[q.name]; });
     row[`d${n}_threat_mean`] = th.threat_mean;
     if (n === 2) row.attention_pass = th.attention_pass;
+    row[`d${n}_read_post_ms`] = r.rt;
+    row[`d${n}_chat_ms`] = c.rt;
+    row[`d${n}_threat_ms`] = th.rt;
+    row[`d${n}_final_verdict_ms`] = f.rt;
+    // Times the participant left the tab or window while on this post's pages.
+    const idx = new Set([r, c, th, f].map((t) => t.trial_index));
+    row[`d${n}_tab_switches`] = jsPsych.data.getInteractionData()
+      .filter({ event: "blur" }).values().filter((e) => idx.has(e.trial)).length;
   });
-  row.self_intro = (all.filter({ discussion: 1, measure: "chat" }).values()[0] || {}).self_intro;
+  row.self_intro = one({ discussion: 1, measure: "chat" }).self_intro;
   row.total_time_ms = all.last(1).values()[0].time_elapsed;
   return row;
 }
@@ -180,16 +195,13 @@ function summaryCsv(info) {
   return keys.join(",") + "\n" + keys.map((k) => cell(row[k])).join(",") + "\n";
 }
 
-// Send the participant's data to the Google Apps Script web app, which adds one row
-// to the "summary" sheet and one row per screen to the "trials" sheet.
+// Send the participant's one-row summary to the Google Apps Script web app, which adds
+// it to the "summary" sheet. The screen-by-screen data (with the page HTML) is not sent.
 // Apps Script doesn't allow reading the reply from another site ("no-cors"), so a
 // request that goes out without a network error counts as saved; the script
 // ignores a participant ID it has already stored, so a retry can't duplicate rows.
 async function saveToGoogleSheets(info) {
-  const flat = (v) => (v !== null && typeof v === "object" ? JSON.stringify(v) : v);
-  const trials = jsPsych.data.get().values().map((t) =>
-    Object.fromEntries(Object.entries(t).map(([k, v]) => [k, flat(v)])));
-  const body = JSON.stringify({ summary: summaryRow(info), trials });
+  const body = JSON.stringify({ summary: summaryRow(info) });
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
       await fetch(CONFIG.GOOGLE_SHEETS_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body });
@@ -224,7 +236,7 @@ async function main() {
       if (data.response !== 0) (jsPsych.abortExperiment || jsPsych.endExperiment).call(jsPsych, "<p>You chose not to take part. You can close this page.</p>");
     },
   };
-  const instructions = { type: jsPsychHtmlButtonResponse, stimulus: TEXT.instructions, choices: ["Start"] };
+  const instructions = { type: jsPsychHtmlButtonResponse, stimulus: TEXT.instructions, choices: ["Start"], data: { measure: "instructions" } };
 
   const sheetsSave = {
     type: jsPsychHtmlButtonResponse,
