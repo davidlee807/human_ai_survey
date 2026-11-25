@@ -13,12 +13,34 @@ const ON_COGNITION = typeof CONDITION !== "undefined" || location.hostname.endsW
 const agentVerdictFor = (v) =>
   v === "YTA" ? "NTA" : v === "NTA" ? "YTA" : jsPsych.randomization.sampleWithoutReplacement(["YTA", "NTA"], 1)[0];
 
-// Balanced assignment through DataPipe if set up; "?cell=0..3" in the URL forces a cell for testing.
+// Ask the Google Apps Script for the cell with the fewest participants so far (see
+// google/Code.gs). Returns null if it can't be reached in time, so the caller falls back.
+async function getCellFromSheet() {
+  if (!CONFIG.GOOGLE_SHEETS_URL || ON_COGNITION) return null;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 8000);
+  try {
+    const q = `?action=assign&pid=${encodeURIComponent(participantId)}`;
+    const res = await fetch(CONFIG.GOOGLE_SHEETS_URL + q, { signal: ctrl.signal });
+    const out = await res.json();
+    const c = Number(out.cell);
+    return out.status === "ok" && Number.isInteger(c) && c >= 0 ? c % N_CELLS : null;
+  } catch (e) {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Balanced assignment: from the Google Sheet (or DataPipe) if set up, else random.
+// "?cell=0..3" in the URL forces a cell for testing (and isn't counted in the Sheet's assignments).
 async function getCell() {
   if (url.cell !== undefined) return Number(url.cell) % N_CELLS;
   if (typeof CONDITION !== "undefined" && !isNaN(Number(CONDITION))) {
     return (((Number(CONDITION) - 1) % N_CELLS) + N_CELLS) % N_CELLS; // Cognition conditions start at 1
   }
+  const fromSheet = await getCellFromSheet();
+  if (fromSheet !== null) return fromSheet;
   if (CONFIG.DATAPIPE_ID) {
     const c = await jsPsychPipe.getCondition(CONFIG.DATAPIPE_ID);
     if (typeof c === "number") return c % N_CELLS;
@@ -214,7 +236,9 @@ async function saveToGoogleSheets(info) {
 
 async function main() {
   document.body.insertAdjacentHTML("afterbegin", `<div class="verdict-key">${TEXT.verdict_key}</div>`);
+  document.body.insertAdjacentHTML("beforeend", `<p id="loading-msg" style="text-align:center">Loading...</p>`);
   const info = decodeCell(await getCell());
+  document.getElementById("loading-msg")?.remove();
   const secondPost = info.firstPost === "A" ? "B" : "A";
   const discussions = [
     { n: 1, postId: info.firstPost, condition: "baseline" },

@@ -50,9 +50,11 @@ When `CONFIG.GOOGLE_SHEETS_URL` is set, each participant's data is sent at the e
 4. Copy the web app URL (ends in `/exec`) into `GOOGLE_SHEETS_URL` in `src/config.js`.
 5. If you edit the script later, use Deploy → Manage deployments → edit → New version, so the URL stays the same.
 
-The URL only lets the page add rows; it can't read your Sheet. Anyone who finds it could send junk rows, so check `participant_id` / `prolific_pid` against Prolific when you analyse.
+The URL only lets the page add rows and ask for a cell; it can't read your Sheet (the cell reply carries only the four cell counts). Anyone who finds it could send junk rows, so check `participant_id` / `prolific_pid` against Prolific when you analyse.
 
-Without DataPipe, participants are assigned to one of the 4 cells at random rather than in strict balance.
+**Balanced cells.** When the page opens, it asks the script for a cell. The script gives the cell with the fewest participants so far, counting finished rows in `summary` plus people who started in the last 60 minutes and haven't finished yet (so a burst of Prolific sign-ups doesn't all land in one cell). Ties are broken at random. Each start is logged in an `assignments` tab (participant ID, cell, time); a participant who reloads keeps their cell. Change `PENDING_MINUTES` in the script if the study takes much longer than an hour. If the script can't be reached within 8 seconds, the page falls back to a random cell. `?cell=` test links skip the script and aren't counted, but test runs that finish do add a `summary` row, so delete test rows before going live.
+
+**After updating `google/Code.gs`, redeploy it** (step 5: Deploy → Manage deployments → edit → Version: New version → Deploy), or the page will keep falling back to random cells.
 
 ## Data
 
