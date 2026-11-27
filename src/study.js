@@ -90,12 +90,41 @@ const escapeHtml = (str) => String(str).replace(/[&<>"']/g, (c) => ({ "&": "&amp
 function factualListHtml(postId, agentVerdict, verdict) {
   const list = FACTUAL_LISTS[postId][agentVerdict][verdict];
   const who = (p) => p.agents.map((n) => FACTUAL.labels[n] || n).join(", ");
-  const items = (points) => points.map((p) => `<li>${escapeHtml(p.text)}<span class="fl-agents">Agreed by: ${who(p)} (${p.agents.length}/${AGENTS.length})</span></li>`).join("");
+  // Every "gen" element is typed out in order by generateList() below.
+  const items = (points) => points.map((p) => `<li><span class="gen">${escapeHtml(p.text)}</span><span class="fl-agents gen">Agreed by: ${who(p)} (${p.agents.length}/${AGENTS.length})</span></li>`).join("");
   return `<details class="chat-context"><summary>Show the post again</summary>${postHtml(POSTS[postId])}</details>
     <div class="factual factual-page"><div class="fl-title">${FACTUAL.title}</div>
-    <div class="fl-verdict">Verdict: ${agentVerdict} (${AGENTS.length}/${AGENTS.length} agents)</div>
-    <div class="fl-head">PROS: points for ${agentVerdict}</div><ul>${items(list.pros)}</ul>
-    <div class="fl-head">CONS: points against ${verdict}</div><ul>${items(list.cons)}</ul></div>`;
+    <div class="fl-verdict gen">Verdict: ${agentVerdict} (${AGENTS.length}/${AGENTS.length} agents)</div>
+    <div class="fl-head gen">PROS: points for ${agentVerdict}</div><ul>${items(list.pros)}</ul>
+    <div class="fl-head gen">CONS: points against ${verdict}</div><ul>${items(list.cons)}</ul></div>`;
+}
+
+// Makes the list look machine-generated: each line is typed out character by character,
+// one line after another, with a cursor. Continue is enabled once the whole list is out.
+function generateList(root, button, onDone) {
+  const t = CONFIG.LIST_TYPING;
+  const lines = [...root.querySelectorAll(".gen")].map((el) => ({ el, text: el.textContent }));
+  lines.forEach(({ el }) => { el.textContent = ""; el.classList.add("gen-wait"); });
+  root.querySelectorAll("li").forEach((li) => li.classList.add("gen-wait"));
+  if (button) button.disabled = true;
+  let i = 0;
+  const nextLine = () => {
+    if (i > 0) lines[i - 1].el.classList.remove("gen-now");
+    if (i >= lines.length) { if (button) button.disabled = false; onDone && onDone(); return; }
+    const { el, text } = lines[i++];
+    el.classList.remove("gen-wait");
+    el.closest("li")?.classList.remove("gen-wait");
+    el.classList.add("gen-now");
+    let n = 0;
+    const tick = () => {
+      n = Math.min(text.length, n + t.chars_per_step);
+      el.textContent = text.slice(0, n);
+      if (n < text.length) setTimeout(tick, t.ms_per_step);
+      else setTimeout(nextLine, t.pause_between_lines);
+    };
+    setTimeout(tick, t.ms_per_step);
+  };
+  setTimeout(nextLine, t.first_delay);
 }
 
 // Humanlike chat: Host asks for the verdict, then the five named agents argue against it.
@@ -165,6 +194,10 @@ function discussionBlock(d) {
     stimulus: () => factualListHtml(d.postId, agentVerdict, initialVerdict),
     choices: ["Continue"],
     data: { ...tag, measure: "agents" },
+    on_load: () => {
+      const disp = jsPsych.getDisplayElement();
+      generateList(disp.querySelector(".factual-page"), disp.querySelector("button.jspsych-btn"));
+    },
   };
 
   const final = {

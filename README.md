@@ -16,7 +16,7 @@ Every participant reads both posts and sees both agent styles, one per post. The
 | Style | Chat after the participant's verdict |
 |---|---|
 | humanlike | The chat opens with introductions (Host welcome, each named agent, the participant types a one-sentence intro). After the verdict, the Host line, then the 5 named agents each post their message. The 2nd and 4th open with "I agree with <previous agent>." |
-| factual | No chat and no Host. The post is shown with the four verdict buttons under it. Then a separate page (not a chat) shows the agents' analysis: the agents' verdict (5/5), PROS (points for the agents' verdict) and CONS (points against the participant's verdict), each point marked with the agents that agree with it (Agent 1 to 5), all at once. |
+| factual | No chat and no Host. The post is shown with the four verdict buttons under it. Then a separate page (not a chat) shows the agents' analysis: the agents' verdict (5/5), PROS (points for the agents' verdict) and CONS (points against the participant's verdict), each point marked with the agents that agree with it (Agent 1 to 5). The list types itself out line by line, as if generated (about 4–5 s; speed in `CONFIG.LIST_TYPING`), and Continue unlocks when it is done. |
 
 Each factual point is one agent's humanlike message, and the 2nd and 4th agents are also listed on the point of the agent before them, matching "I agree with …" in the humanlike chat.
 

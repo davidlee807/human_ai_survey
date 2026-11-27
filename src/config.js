@@ -22,4 +22,13 @@ const CONFIG = {
     pause_after_message: 0,      // gap after a Host or agent message before the next one starts typing
     pause_after_reply: 700,      // gap after the participant answers before the Host replies
   },
+
+  // Factual condition: the pros/cons list is typed out line by line, as if generated.
+  // A list of ~1,000 characters takes about 1000 / 6 x 15 ms = 2.5 s plus the pauses (~4-5 s in all).
+  LIST_TYPING: {
+    first_delay: 300,            // pause before the first line starts
+    chars_per_step: 6,           // characters added each step
+    ms_per_step: 15,             // time between steps
+    pause_between_lines: 100,    // pause after each line before the next one starts
+  },
 };
