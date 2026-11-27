@@ -57,3 +57,5 @@ body { background: #f4f4f2; }
 .factual li { margin-bottom: 6px; }
 .factual .fl-agents { display: block; color: #555; font-size: 13px; }
 .reason-box { width: 100%; box-sizing: border-box; min-height: 90px; font-size: 16px; padding: 10px 12px; border: 1px solid #bbb; border-radius: 8px; }
+.factual-page { background: #f7f8fa; border: 1px solid #ccc; border-radius: 6px; padding: 14px 18px; margin-top: 12px; }
+.factual .fl-title { font-weight: 700; font-size: 15px; border-bottom: 1px solid #ccc; padding-bottom: 6px; margin-bottom: 8px; }
