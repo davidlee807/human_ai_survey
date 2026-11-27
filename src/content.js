@@ -27,64 +27,62 @@ const HOST = { name: "Host", color: "#333333" };
 
 const POSTS = {
   A: {
-    title: "AITA for telling a mother that maybe her teenage son needs to toughen up?",
-    body: `<p>Earlier in the week the mother of one of my son’s classmates came over to discuss a problem between our boys. I guess my son has been telling her son that he stinks, is gross, and so on. I told her I would talk to my son about it and we exchanged numbers in case there were any other problems.</p>
-      <p>I talked to my son and he didn’t deny it. He says the boy does smell really bad and is assigned to sit next to him in one of their classes. I told him to just try to ignore it and just stay away from him otherwise.</p>
-      <p>Last night I got a call from the classmate’s mother saying that my son had picked on her’s again during lunch and that he was upset again. I confronted my son about it and he said that her son has been purposely sitting across from him at lunch because he knows that it bothers my son.</p>
-      <p>I called the classmate’s mother back and told her what my son had said. I told her that it’s not ok that my son was rude, but to be fair no one wants to smell bad hygiene while they’re trying to eat. And also if her son was going to go out of his way to put himself in that position then maybe he should toughen up a bit.</p>
-      <p>She just hung up on me. I don’t condone bullying and have talked to my son about it again, but at the same time I don’t feel my viewpoint on it is all that ridiculous.</p>`,
+    title: "AITA “blocking” a cycleist from passing on bridge that is pedestrian only.",
+    body: `<p>Part of my walk/ with my dogs is on a college campus. We walk over a pedestrian bridge. on both sides of the bridge there are signs that it is pedestrian only as well as poles and things on the ground to deter bikes and other modes of transit from riding on the bridge. Of Course, people will get off, walk through/over them and get back on.</p>
+      <p>When I walk on the bridge, I give my dogs as Much slack as possible which usally ends with me in the middle of the bridge and my dogs right next to the railing. Of course, if someone is coming from the other way I pull my dogs close to me and get to the side and also look back constantly in case a runner is coming. However, I don’t feel I need to move out of the way from a biker, skateboarder or scooter rider.</p>
+      <p>I was off today so, was on a walk later than I usually am on week day. A cyclist was in front of us, swerved to a stop in front of us and angrily said, “you’re blocking the bridge.” I said, ”and you‘re on a bike.” The man said, “so fucking what?“ I replied, ’This is a pedestrian bridge.” Dude got off his bike and walked in passed me but called me a jackass.</p>
+      <p>AITA?</p>`,
     agent_messages: {
       NTA: {
         // The participant said YTA
         YTA: {
-          Cody:   "I'd say NTA. YTA doesn't really fit, since OP took the complaint seriously both times and talked to their son after each one. A parent who keeps following up like that isn't brushing the bullying off, so the conflict isn't coming from OP.",
-          Bella:  "To me this is NTA. YTA feels off because OP opened the callback by saying their son's rudeness wasn't okay, which shows real respect for how the other boy felt. The mother hanging up meant OP's honest attempt to explain both kids' sides never got heard.",
-          Nathan: "This reads as NTA. YTA skips the order of events: after the first visit, OP told their son to stay away from the boy outside of class. The next problem happened when the classmate sat across from him at lunch, so the new conflict started with the classmate's choice.",
-          Zoe:    "I'm going with NTA. YTA overlooks the lunch detail, where the classmate sat across from OP's son on purpose because he knew it bothered him. OP's toughen-up comment was a response to that specific choice, and pointing out that someone keeps walking into the same situation is fair.",
-          "Mario": "My take is NTA. YTA treats OP's phone call as the problem, but OP was entitled to pass along their own son's account when the mother called with a complaint. Sharing both sides is a normal part of two parents working out a problem between their kids."
+          Cody:   "I'd say NTA. YTA doesn't really fit, because the bridge is marked pedestrian only on both ends and even has poles to keep bikes off. OP was using it exactly as intended, so there was no duty to clear a path for someone riding where they weren't allowed.",
+          Bella:  "To me this is NTA. YTA feels off because the cyclist swerved to a stop right in front of OP and the dogs and started off angry. OP's replies were short and factual, while he swore and called OP a jackass, so the hostility came from him.",
+          Nathan: "This reads as NTA. YTA skips the order of events: the cyclist rode past the barriers, stopped in front of OP, complained, swore, and then got off and walked his bike past. He could have done that last step from the start, and the conflict came from skipping it.",
+          Zoe:    "I'm going with NTA. YTA overlooks the detail that OP pulls the dogs in and moves aside for anyone walking or running toward them, and keeps checking behind for runners. OP makes room for the people the bridge is meant for, which is fair.",
+          Mario:  "My take is NTA. YTA treats OP's position as the problem, but OP was entitled to walk in the middle of a pedestrian bridge. The cyclist always had the option of getting off and walking, which is what the signs ask of everyone."
         },
         // The participant said ESH
         ESH: {
-          "Cody": "I'd say NTA. The classmate sitting across from OP's son on purpose wasn't great, but ESH doesn't fit because OP's toughen-up line was blunt, not cruel. It was tied directly to the boy choosing that seat, not a dig at him as a person.",
-      "Bella": "To me this is NTA. I get why ESH comes up, since the mother hanging up was cold, but OP started the call by admitting their son's rudeness wasn't okay. That kind of honesty about your own kid's behavior is caring toward the other family, not something to count against OP.",
-      "Nathan": "This reads as NTA. The mother ending the call was a poor move, but ESH misses how OP handled each step: listening at the first visit, exchanging numbers, talking to their son, then calling back. Every step OP took was aimed at solving the problem rather than adding to it.",
-      "Zoe": "I'm going with NTA. The classmate choosing that lunch seat wasn't fair to OP's son, and ESH counts OP's hygiene remark against them, but the point was specifically about eating. Not wanting to smell something unpleasant during a meal is an ordinary reaction, not an insult from OP.",
-      "Mario": "My take is NTA. The mother hanging up was rude, but ESH asks OP to have handled it perfectly, and OP was entitled to report what their son said when she called. Relaying your own kid's account is a reasonable thing for a parent to do, not a wrong."
+          Cody:   "I'd say NTA. The cyclist swearing wasn't great, but ESH doesn't fit because OP's reply, \"and you're on a bike,\" was blunt, not cruel. It was tied directly to him riding on a pedestrian bridge, not a dig at him as a person.",
+          Bella:  "To me this is NTA. I get why ESH comes up, since OP's comeback was a bit sharp, but OP was the one who got cut off and sworn at. Answering with two short facts after being treated like that is pretty restrained, not something to count against OP.",
+          Nathan: "This reads as NTA. The cyclist's reaction was a poor move, but ESH misses how OP handled each step: walking where walking is allowed, answering his complaint calmly, and letting him pass once he got off the bike. None of those steps added to the problem.",
+          Zoe:    "I'm going with NTA. The cyclist was out of line, and ESH counts the long leashes against OP, but the dogs were kept by the railing, and OP reels them in for oncoming walkers and runners. That's an ordinary way to walk dogs on a footbridge, not a wrong.",
+          Mario:  "My take is NTA. The cyclist was rude, but ESH asks OP to have handled it perfectly, and OP was entitled to point out the bridge is pedestrian only. Stating the rule that is posted on both ends is a reasonable thing to say, not a wrong."
         },
         // The participant said NAH
         NAH: {
-          "Cody": "I'd say NTA. NAH lets the mother off too easily, because she hung up on OP in the middle of a conversation about their kids. Ending a call that way isn't a misunderstanding, it's refusing to hear the other side out at all.",
-      "Bella": "To me this is NTA. NAH treats the lunch trouble like bad luck, but the classmate sat across from OP's son because he knew it would bother him. Deliberately setting up a situation that upsets someone else is unkind, even if he was hurt by the insults earlier.",
-      "Nathan": "This reads as NTA. NAH assumes things just went wrong, but look at the sequence: OP told their son to keep away, and then the classmate moved toward him at lunch. The second incident followed a step the classmate took after the first one had been handled.",
-      "Zoe": "I'm going with NTA. NAH would make sense for the classroom, since the seating there was assigned and nobody chose it. Lunch is different, because the classmate picked the seat across from OP's son himself, so that part was a decision rather than bad luck.",
-      "Mario": "My take is NTA. NAH doesn't account for the mother asking OP to handle their son twice, then hanging up once OP raised her own son's part. Expecting one family to fix things while refusing to consider the other side isn't a mix-up, it's a real failing on her end."
+          Cody:   "I'd say NTA. NAH lets the cyclist off too easily, because he rode onto a bridge that is clearly marked for pedestrians and then swore at OP. Ignoring signs and barriers isn't a misunderstanding, it's a choice to break the rule.",
+          Bella:  "To me this is NTA. NAH treats this like a bad moment, but the cyclist swerved in front of OP and the dogs, swore, and called OP a jackass. Treating someone that way for walking on a footbridge is unkind, even if he was in a hurry.",
+          Nathan: "This reads as NTA. NAH assumes things just went wrong, but look at the sequence: the cyclist passed the poles, rode onto the bridge, and then demanded that OP move. The conflict followed choices he made before OP said anything.",
+          Zoe:    "I'm going with NTA. NAH would make sense if the rules were unclear, but there are signs on both sides of the bridge and things on the ground to stop bikes. With all that in place, riding across was a decision, not an honest mistake.",
+          Mario:  "My take is NTA. NAH doesn't account for the cyclist expecting OP to clear the way while he was the one breaking the posted rule. Demanding that others make room for something that isn't allowed there is a real failing on his part."
         },
       },
       YTA: {
         // The participant said NTA
         NTA: {
-          "Cody": "I'd say YTA. NTA leans on the classmate sitting nearby, but OP's son admitted calling him gross and smelly, and OP answered the mother by telling her son to toughen up. That turns a bullying complaint into the bullied kid's problem.",
-      "Bella": "To me this is YTA. NTA focuses on OP's son being bothered, but the other boy was upset enough that his mother came over and then called again. Hearing that her son ought to toughen up after all that would hurt any parent, so hanging up makes sense.",
-      "Nathan": "This reads as YTA. NTA gives OP credit for talking to their son, but in that first talk OP only told him to ignore the smell and stay away. The insults themselves weren't addressed then, so the lunch incident followed from how OP handled the first complaint.",
-      "Zoe": "I'm going with YTA. NTA treats the hygiene point as fair, but OP used the boy's smell to explain why their son's comments were understandable. Pointing to a kid's body odor as the reason he gets picked on puts the blame on him for being bullied.",
-      "Mario": "My take is YTA. NTA says the classmate chose to sit there, but even if that's true, OP's son could move seats at lunch. OP could have simply agreed to talk to their son again instead of adding a lecture about the other boy toughening up."
+          Cody:   "I'd say YTA. NTA leans on the pedestrian-only signs, but OP admits to taking up the middle of the bridge on purpose and refusing to move for bikes. Choosing to block someone to make a point turns a rule into a standoff.",
+          Bella:  "To me this is YTA. NTA focuses on the cyclist breaking the rule, but having to swerve to a stop next to two dogs on long leashes is startling. Being met with a sarcastic comeback after that would frustrate anyone, so his anger makes sense.",
+          Nathan: "This reads as YTA. NTA gives OP credit for answering calmly, but when the cyclist said OP was blocking the bridge, OP replied with a comeback instead of moving aside. That reply is what turned the exchange into swearing and name-calling.",
+          Zoe:    "I'm going with YTA. NTA treats the long leashes as harmless, but OP says the dogs are right next to the railing while OP is in the middle. That means the leash stretches across the walkway, which is a tripping hazard for anyone on the bridge.",
+          Mario:  "My take is YTA. NTA says the cyclist shouldn't have been riding, and that may be true, but OP isn't the one who enforces campus rules. OP could have simply shortened the leashes for a few seconds instead of adding a lecture about the signs."
         },
         // The participant said ESH
         ESH: {
-          "Cody": "I'd say YTA. ESH counts the mother hanging up, but that's a small thing next to OP telling her that her bullied son ought to toughen up. Ending a call after hearing that is a pretty normal reaction from a parent.",
-      "Bella": "To me this is YTA. ESH puts some blame on the classmate, but he's a teenager who has been called gross and smelly, and the idea that he sits there on purpose is only OP's son's account. The hurt on his side is real, while OP chose to make it worse.",
-      "Nathan": "This reads as YTA. ESH suggests both parents slipped, but the mother came over in person, agreed to swap numbers, and called when it happened again. She followed a reasonable process each time, and the only escalation in that sequence came from OP's comments.",
-      "Zoe": "I'm going with YTA. ESH treats the classmate's smell as part of the problem, but having poor hygiene isn't doing anything wrong to anyone. OP brought it up as if it explained the insults, which shifts blame onto a kid for something that isn't a fault.",
-      "Mario": "My take is YTA. ESH spreads the blame, but the mother did about all a parent can do, which is raise it with the other parent. OP had promised to deal with their son and could have stuck to that, rather than turning the call back on her son."
-
+          Cody:   "I'd say YTA. ESH counts the cyclist riding on the bridge, but that's a small thing next to OP deliberately blocking him to prove a point. Getting irritated after being blocked on purpose is a pretty normal reaction.",
+          Bella:  "To me this is YTA. ESH puts some blame on the cyclist, but plenty of people ride across, as OP says, and he was likely just trying to get somewhere. Being stopped and talked down to is real frustration on his side, while OP chose to cause it.",
+          Nathan: "This reads as YTA. ESH suggests both sides slipped, but the cyclist pointed out the problem, heard the rule, then got off and walked his bike past. He ended up following the rule, and the only escalation in that sequence came from OP's comeback.",
+          Zoe:    "I'm going with YTA. ESH treats the cyclist's swearing as the main problem, but OP had already said they don't feel they need to move for bikes. Planning in advance not to make room for someone shows the blocking was intentional, not a fault of his.",
+          Mario:  "My take is YTA. ESH spreads the blame, but the cyclist did about what anyone would do, which is ask the person in the way to move. OP could have stepped aside and let campus security handle the rule, rather than turning it into a confrontation."
         },
         // The participant said NAH
         NAH: {
-          "Cody": "I'd say YTA. NAH makes it sound like a misunderstanding, but OP knowingly told a mother her son ought to toughen up after he was bullied. That was a choice OP made on the call, not an accident or a slip of the tongue.",
-      "Bella": "To me this is YTA. NAH misses how upset the boy already was, since his mother had to step in twice. OP's words told her that her son's hurt didn't count for much, and that adds to the harm rather than being a harmless difference of opinion.",
-      "Nathan": "This reads as YTA. NAH would fit if OP lacked information, but by the second call OP knew their son had insulted the boy and kept doing it. Blaming the classmate with all of that known is a decision, not an honest mistake.",
-      "Zoe": "I'm going with YTA. NAH frames this as a clash over the smell, but OP's son calling a classmate gross and stinky is bullying, not a preference. OP then repeated the hygiene point to the boy's mother, which goes past disagreeing into shaming.",
-      "Mario": "My take is YTA. NAH overlooks OP's first instruction, which was to ignore the smell and stay away instead of stopping the insults. That treated the other boy as the problem, and the insults came up again at lunch soon after."
+          Cody:   "I'd say YTA. NAH makes it sound like a misunderstanding, but OP knowingly stays in the middle of the bridge and refuses to move for bikes. That was a choice OP made in advance, not an accident or a slip.",
+          Bella:  "To me this is YTA. NAH misses how frustrated the cyclist already was when he swerved to a stop. OP's comeback told him his problem didn't count for much, and that adds to the tension rather than being a harmless difference of opinion.",
+          Nathan: "This reads as YTA. NAH would fit if OP didn't realize they were in the way, but the cyclist said so directly. Answering with a comeback with that knowledge, instead of moving over, is a decision, not an honest mistake.",
+          Zoe:    "I'm going with YTA. NAH frames this as a clash over the rules, but long leashes stretched across a narrow bridge are a hazard to everyone, including the dogs. Keeping them that way on purpose goes past a difference of opinion into being careless.",
+          Mario:  "My take is YTA. NAH overlooks OP's own rule, which is to move aside for walkers and runners but not for bikes. That treats cyclists as people to be punished, and that attitude is what led straight to the confrontation on the bridge."
         },
       },
     },
@@ -170,70 +168,70 @@ const FACTUAL_LISTS = {
     NTA: {
       YTA: {
         pros: [
-          { agents: ["Cody", "Bella"], text: "OP acted on both complaints and spoke to their son after each one. Repeated follow-up is not dismissal of the bullying." },
-          { agents: ["Bella"], text: "OP opened the callback by stating that their son's rudeness was not okay. The mother hung up before OP's account of both children was heard." },
-          { agents: ["Mario"], text: "OP relayed their own son's account after the mother called with a complaint. Sharing both sides is a standard step when two parents resolve a conflict between their children." },
+          { agents: ["Cody", "Bella"], text: "The bridge is marked pedestrian only on both ends and has poles to keep bikes off. OP was using it as intended and had no duty to clear a path for a cyclist riding there." },
+          { agents: ["Bella"], text: "The cyclist swerved to a stop in front of OP and the dogs and opened with an angry complaint. OP's replies were short and factual. The cyclist swore and called OP a jackass." },
+          { agents: ["Mario"], text: "OP was entitled to walk in the middle of a pedestrian bridge. The cyclist always had the option to dismount and walk, as the signs require of everyone." },
         ],
         cons: [
-          { agents: ["Nathan", "Zoe"], text: "YTA omits the order of events. After the first visit, OP told their son to stay away from the classmate outside class. The next conflict began when the classmate sat across from him at lunch." },
-          { agents: ["Zoe"], text: "YTA omits that the classmate sat across from OP's son on purpose, knowing it bothered him. OP's \"toughen up\" comment referred to that specific choice." },
+          { agents: ["Nathan", "Zoe"], text: "YTA omits the order of events. The cyclist rode past the barriers, stopped, complained, swore, then dismounted and walked past. Dismounting was available from the start." },
+          { agents: ["Zoe"], text: "YTA omits that OP pulls the dogs in and moves aside for oncoming walkers and runners, and checks behind for runners. OP makes room for the bridge's intended users." },
         ],
       },
       ESH: {
         pros: [
-          { agents: ["Bella"], text: "OP began the call by stating that their son's rudeness was not okay. This is an acknowledgement of their own child's behavior toward the other family." },
-          { agents: ["Nathan", "Zoe"], text: "OP's steps: listened at the first visit, exchanged numbers, spoke to their son, called back. Each step was directed at resolving the problem." },
-          { agents: ["Mario"], text: "The mother hung up on OP. OP reported their son's account when she called, which is a standard parental action." },
+          { agents: ["Bella"], text: "OP was cut off and sworn at. OP answered with two short factual statements, which is a restrained response." },
+          { agents: ["Nathan", "Zoe"], text: "OP's steps: walked where walking is allowed, answered the complaint, let the cyclist pass once he dismounted. None of these steps added to the problem." },
+          { agents: ["Mario"], text: "The cyclist was rude. OP stated that the bridge is pedestrian only, which is the rule posted on both ends. Stating a posted rule is a reasonable action." },
         ],
         cons: [
-          { agents: ["Cody", "Bella"], text: "The classmate chose to sit across from OP's son. OP's \"toughen up\" line was blunt, but it referred to that seat choice, not to the boy as a person." },
-          { agents: ["Zoe"], text: "ESH counts OP's hygiene remark against OP. The remark concerned smell during meals, which is an ordinary reaction, not an insult." },
+          { agents: ["Cody", "Bella"], text: "The cyclist swore at OP. OP's reply \"and you're on a bike\" was blunt, but it referred to riding on a pedestrian bridge, not to the cyclist as a person." },
+          { agents: ["Zoe"], text: "ESH counts the long leashes against OP. The dogs were kept by the railing, and OP reels them in for oncoming walkers and runners. This is an ordinary way to walk dogs on a footbridge." },
         ],
       },
       NAH: {
         pros: [
-          { agents: ["Bella"], text: "The classmate sat across from OP's son because he knew it would bother him. Deliberately creating a situation that upsets someone is unkind, regardless of the earlier insults." },
-          { agents: ["Nathan", "Zoe"], text: "Sequence: OP told their son to keep away from the classmate. Afterwards, the classmate moved toward him at lunch. The second incident followed the classmate's action." },
-          { agents: ["Mario"], text: "The mother asked OP to address their son twice, then hung up when OP raised her son's part. Requiring one family to act while refusing to consider the other side is a failing on her part." },
+          { agents: ["Bella"], text: "The cyclist swerved in front of OP and the dogs, swore, and called OP a jackass. Treating someone that way for walking on a footbridge is unkind, regardless of being in a hurry." },
+          { agents: ["Nathan", "Zoe"], text: "Sequence: the cyclist passed the poles, rode onto the bridge, then demanded that OP move. The conflict followed his choices, made before OP said anything." },
+          { agents: ["Mario"], text: "The cyclist expected OP to clear the way while he was breaking the posted rule. Demanding room for an activity that is not allowed there is a failing on his part." },
         ],
         cons: [
-          { agents: ["Cody", "Bella"], text: "NAH does not account for the mother hanging up mid-conversation. Ending the call was a refusal to hear the other side, not a misunderstanding." },
-          { agents: ["Zoe"], text: "NAH applies to the classroom, where seating was assigned. It does not apply to lunch, where the classmate chose the seat himself." },
+          { agents: ["Cody", "Bella"], text: "NAH does not account for the cyclist riding onto a bridge clearly marked for pedestrians and then swearing at OP. Ignoring signs and barriers is a choice, not a misunderstanding." },
+          { agents: ["Zoe"], text: "NAH would apply if the rules were unclear. There are signs on both sides and obstacles on the ground to stop bikes, so riding across was a decision." },
         ],
       },
     },
     YTA: {
       NTA: {
         pros: [
-          { agents: ["Cody", "Bella"], text: "OP's son admitted calling the classmate gross and smelly. OP responded to the mother by saying her son should toughen up, which makes the bullying complaint the bullied child's problem." },
-          { agents: ["Bella"], text: "The classmate was upset enough that his mother came over and then called again. After two complaints, being told her son should toughen up makes hanging up an expected response." },
-          { agents: ["Mario"], text: "Even if the classmate chose the seat, OP's son could move seats at lunch. OP could have agreed to talk to their son again without adding that the other boy should toughen up." },
+          { agents: ["Cody", "Bella"], text: "OP states that they take up the middle of the bridge on purpose and do not move for bikes. Deliberately blocking someone to make a point turns a rule into a standoff." },
+          { agents: ["Bella"], text: "The cyclist had to swerve to a stop next to two dogs on long leashes, then received a sarcastic reply. Frustration is an expected response to that sequence." },
+          { agents: ["Mario"], text: "Even if the cyclist should not have been riding, OP does not enforce campus rules. OP could have shortened the leashes for a few seconds without commenting on the signs." },
         ],
         cons: [
-          { agents: ["Nathan", "Zoe"], text: "NTA credits OP for talking to their son. In the first talk, OP only told him to ignore the smell and stay away. The insults were not addressed, and the lunch incident followed." },
-          { agents: ["Zoe"], text: "NTA treats the hygiene point as fair. OP used the boy's smell to explain why their son's comments were understandable, which places the blame for the bullying on the bullied child." },
+          { agents: ["Nathan", "Zoe"], text: "NTA credits OP for answering calmly. When told they were blocking the bridge, OP replied with a comeback instead of moving aside. The swearing and name-calling followed that reply." },
+          { agents: ["Zoe"], text: "NTA treats the long leashes as harmless. With OP in the middle and the dogs at the railing, the leash stretches across the walkway, which is a tripping hazard for anyone on the bridge." },
         ],
       },
       ESH: {
         pros: [
-          { agents: ["Nathan", "Zoe"], text: "The mother came over in person, agreed to exchange numbers, and called when it happened again. Each step was reasonable. The only escalation in the sequence came from OP's comments." },
-          { agents: ["Mario"], text: "The mother raised the issue with the other parent, which is the expected action. OP had promised to deal with their son and could have kept to that instead of turning the call back on her son." },
+          { agents: ["Nathan", "Zoe"], text: "The cyclist raised the problem, heard the rule, then dismounted and walked past. He complied with the rule. The only escalation in the sequence came from OP's comeback." },
+          { agents: ["Mario"], text: "The cyclist asked the person in the way to move, which is the expected action. OP could have stepped aside and left the rule to campus security instead of starting a confrontation." },
         ],
         cons: [
-          { agents: ["Cody", "Bella"], text: "ESH counts the mother hanging up. That is minor compared with OP telling her that her bullied son should toughen up. Ending a call after that statement is a normal parental reaction." },
-          { agents: ["Bella"], text: "ESH puts some blame on the classmate. He is a teenager who was called gross and smelly, and the claim that he sits there on purpose comes only from OP's son." },
-          { agents: ["Zoe"], text: "ESH treats the classmate's smell as part of the problem. Poor hygiene is not a wrong done to anyone, and OP presented it as an explanation for the insults." },
+          { agents: ["Cody", "Bella"], text: "ESH counts the cyclist riding on the bridge. That is minor compared with OP deliberately blocking him to prove a point. Irritation after being blocked on purpose is a normal reaction." },
+          { agents: ["Bella"], text: "ESH puts some blame on the cyclist. OP states that many people ride across, and he was likely trying to get somewhere. Being stopped and talked down to caused real frustration." },
+          { agents: ["Zoe"], text: "ESH treats the cyclist's swearing as the main problem. OP had decided in advance not to move for bikes, so the blocking was intentional." },
         ],
       },
       NAH: {
         pros: [
-          { agents: ["Bella"], text: "The classmate was already upset, and his mother had to step in twice. OP's statement told her that her son's hurt did not count for much, which adds to the harm." },
-          { agents: ["Zoe"], text: "Calling a classmate gross and stinky is bullying, not a preference. OP repeated the hygiene point to the boy's mother, which is shaming, not disagreement." },
-          { agents: ["Mario"], text: "OP's first instruction was to ignore the smell and stay away, not to stop the insults. This treated the other boy as the problem, and the insults recurred at lunch." },
+          { agents: ["Bella"], text: "The cyclist was already frustrated when he swerved to a stop. OP's comeback signalled that his problem did not count, which added to the tension." },
+          { agents: ["Zoe"], text: "Long leashes stretched across a narrow bridge are a hazard to everyone, including the dogs. Keeping them that way on purpose is careless, not a difference of opinion." },
+          { agents: ["Mario"], text: "OP's own rule is to move aside for walkers and runners but not for bikes. This treats cyclists as people to be punished, and it led directly to the confrontation." },
         ],
         cons: [
-          { agents: ["Cody", "Bella"], text: "NAH frames this as a misunderstanding. OP knowingly told a mother that her bullied son should toughen up. This was a choice made on the call, not an accident." },
-          { agents: ["Nathan", "Zoe"], text: "NAH would apply if OP lacked information. By the second call, OP knew their son had insulted the boy repeatedly. Blaming the classmate with that knowledge is a decision, not a mistake." },
+          { agents: ["Cody", "Bella"], text: "NAH frames this as a misunderstanding. OP knowingly stays in the middle of the bridge and refuses to move for bikes. This was a choice made in advance, not an accident." },
+          { agents: ["Nathan", "Zoe"], text: "NAH would apply if OP did not realize they were in the way. The cyclist said so directly. Replying with a comeback instead of moving over is a decision, not a mistake." },
         ],
       },
     },
