@@ -5,6 +5,7 @@ const jsPsych = initJsPsych({
 });
 
 const url = jsPsych.data.urlVariables();
+const STARTED_AT = new Date().toISOString(); // when the page was opened
 const participantId = url.PROLIFIC_PID || jsPsych.randomization.randomID(10);
 const N_CELLS = 4;
 // On Cognition.run the platform saves the data and assigns a balanced CONDITION itself.
@@ -207,10 +208,9 @@ function summaryRow(info) {
     participant_id: participantId, prolific_pid: url.PROLIFIC_PID || "", study_id: url.STUDY_ID || "",
     session_id: url.SESSION_ID || "", cell: info.cell, group: info.group,
     first_style: info.firstStyle, first_post: info.firstPost,
-    started_at: one({ measure: "consent" }).timestamp,
+    started_at: STARTED_AT,
     finished_at: new Date().toISOString(),
     is_mobile: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent),
-    consent_ms: one({ measure: "consent" }).rt,
     instructions_ms: one({ measure: "instructions" }).rt,
   };
   [1, 2].forEach((n) => {
@@ -280,15 +280,6 @@ async function main() {
     first_style: info.firstStyle, first_post: info.firstPost,
   });
 
-  const consent = {
-    type: jsPsychHtmlButtonResponse,
-    stimulus: TEXT.consent,
-    choices: ["I agree to take part", "I do not agree"],
-    data: { measure: "consent" },
-    on_finish: (data) => {
-      if (data.response !== 0) (jsPsych.abortExperiment || jsPsych.endExperiment).call(jsPsych, "<p>You chose not to take part. You can close this page.</p>");
-    },
-  };
   const instructions = { type: jsPsychHtmlButtonResponse, stimulus: TEXT.instructions, choices: ["Start"], data: { measure: "instructions" } };
 
   const sheetsSave = {
@@ -347,7 +338,6 @@ async function main() {
   };
 
   await jsPsych.run([
-    consent,
     instructions,
     ...discussionBlock(discussions[0]),
     ...discussionBlock(discussions[1]),
