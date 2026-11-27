@@ -7,6 +7,12 @@
 //   participant NTA -> agents YTA
 //   participant ESH or NAH -> agents YTA or NTA, 50/50 at random
 // So each agent has three explanations for YTA and three for NTA, per post.
+//
+// There are two styles, and every participant sees both (one per post):
+//   humanlike: the five named agents introduce themselves and each posts its message
+//              (agent_messages below).
+//   factual:   no introductions; one machine-style pros/cons list with the same points,
+//              each marked with the agents that agree with it (FACTUAL_LISTS below).
 
 // "intro" is what each agent says when introducing themselves at the start of the chat.
 const AGENTS = [
@@ -143,32 +149,188 @@ const POSTS = {
   },
 };
 
+// ---------------------------------------------------------------------------
+// FACTUAL CONDITION
+// The same arguments as agent_messages above, rewritten as one machine-style
+// pros/cons list per cell: FACTUAL_LISTS[post][agents' verdict][participant's verdict].
+//   pros = points for the agents' verdict, cons = points against the participant's verdict.
+// Each point names the agents that agree with it (by the names in AGENTS; they are
+// shown with the labels in FACTUAL.labels). Each point is one agent's message from the
+// humanlike condition, and the 2nd and 4th agents are also listed on the point of the
+// agent before them, which mirrors "I agree with Cody/Nathan" in the humanlike chat.
+const FACTUAL = {
+  // Shown as the sender of the list in the chat.
+  sender: "Agent output",
+  color: "#6b7280",
+  // How each agent is named in the list. Neutral labels, so the factual chat has no names.
+  labels: { Cody: "Agent 1", Bella: "Agent 2", Nathan: "Agent 3", Zoe: "Agent 4", Mario: "Agent 5" },
+};
+
+const FACTUAL_LISTS = {
+  A: {
+    NTA: {
+      YTA: {
+        pros: [
+          { agents: ["Cody", "Bella"], text: "OP acted on both complaints and spoke to their son after each one. Repeated follow-up is not dismissal of the bullying." },
+          { agents: ["Bella"], text: "OP opened the callback by stating that their son's rudeness was not okay. The mother hung up before OP's account of both children was heard." },
+          { agents: ["Mario"], text: "OP relayed their own son's account after the mother called with a complaint. Sharing both sides is a standard step when two parents resolve a conflict between their children." },
+        ],
+        cons: [
+          { agents: ["Nathan", "Zoe"], text: "YTA omits the order of events. After the first visit, OP told their son to stay away from the classmate outside class. The next conflict began when the classmate sat across from him at lunch." },
+          { agents: ["Zoe"], text: "YTA omits that the classmate sat across from OP's son on purpose, knowing it bothered him. OP's \"toughen up\" comment referred to that specific choice." },
+        ],
+      },
+      ESH: {
+        pros: [
+          { agents: ["Bella"], text: "OP began the call by stating that their son's rudeness was not okay. This is an acknowledgement of their own child's behavior toward the other family." },
+          { agents: ["Nathan", "Zoe"], text: "OP's steps: listened at the first visit, exchanged numbers, spoke to their son, called back. Each step was directed at resolving the problem." },
+          { agents: ["Mario"], text: "The mother hung up on OP. OP reported their son's account when she called, which is a standard parental action." },
+        ],
+        cons: [
+          { agents: ["Cody", "Bella"], text: "The classmate chose to sit across from OP's son. OP's \"toughen up\" line was blunt, but it referred to that seat choice, not to the boy as a person." },
+          { agents: ["Zoe"], text: "ESH counts OP's hygiene remark against OP. The remark concerned smell during meals, which is an ordinary reaction, not an insult." },
+        ],
+      },
+      NAH: {
+        pros: [
+          { agents: ["Bella"], text: "The classmate sat across from OP's son because he knew it would bother him. Deliberately creating a situation that upsets someone is unkind, regardless of the earlier insults." },
+          { agents: ["Nathan", "Zoe"], text: "Sequence: OP told their son to keep away from the classmate. Afterwards, the classmate moved toward him at lunch. The second incident followed the classmate's action." },
+          { agents: ["Mario"], text: "The mother asked OP to address their son twice, then hung up when OP raised her son's part. Requiring one family to act while refusing to consider the other side is a failing on her part." },
+        ],
+        cons: [
+          { agents: ["Cody", "Bella"], text: "NAH does not account for the mother hanging up mid-conversation. Ending the call was a refusal to hear the other side, not a misunderstanding." },
+          { agents: ["Zoe"], text: "NAH applies to the classroom, where seating was assigned. It does not apply to lunch, where the classmate chose the seat himself." },
+        ],
+      },
+    },
+    YTA: {
+      NTA: {
+        pros: [
+          { agents: ["Cody", "Bella"], text: "OP's son admitted calling the classmate gross and smelly. OP responded to the mother by saying her son should toughen up, which makes the bullying complaint the bullied child's problem." },
+          { agents: ["Bella"], text: "The classmate was upset enough that his mother came over and then called again. After two complaints, being told her son should toughen up makes hanging up an expected response." },
+          { agents: ["Mario"], text: "Even if the classmate chose the seat, OP's son could move seats at lunch. OP could have agreed to talk to their son again without adding that the other boy should toughen up." },
+        ],
+        cons: [
+          { agents: ["Nathan", "Zoe"], text: "NTA credits OP for talking to their son. In the first talk, OP only told him to ignore the smell and stay away. The insults were not addressed, and the lunch incident followed." },
+          { agents: ["Zoe"], text: "NTA treats the hygiene point as fair. OP used the boy's smell to explain why their son's comments were understandable, which places the blame for the bullying on the bullied child." },
+        ],
+      },
+      ESH: {
+        pros: [
+          { agents: ["Nathan", "Zoe"], text: "The mother came over in person, agreed to exchange numbers, and called when it happened again. Each step was reasonable. The only escalation in the sequence came from OP's comments." },
+          { agents: ["Mario"], text: "The mother raised the issue with the other parent, which is the expected action. OP had promised to deal with their son and could have kept to that instead of turning the call back on her son." },
+        ],
+        cons: [
+          { agents: ["Cody", "Bella"], text: "ESH counts the mother hanging up. That is minor compared with OP telling her that her bullied son should toughen up. Ending a call after that statement is a normal parental reaction." },
+          { agents: ["Bella"], text: "ESH puts some blame on the classmate. He is a teenager who was called gross and smelly, and the claim that he sits there on purpose comes only from OP's son." },
+          { agents: ["Zoe"], text: "ESH treats the classmate's smell as part of the problem. Poor hygiene is not a wrong done to anyone, and OP presented it as an explanation for the insults." },
+        ],
+      },
+      NAH: {
+        pros: [
+          { agents: ["Bella"], text: "The classmate was already upset, and his mother had to step in twice. OP's statement told her that her son's hurt did not count for much, which adds to the harm." },
+          { agents: ["Zoe"], text: "Calling a classmate gross and stinky is bullying, not a preference. OP repeated the hygiene point to the boy's mother, which is shaming, not disagreement." },
+          { agents: ["Mario"], text: "OP's first instruction was to ignore the smell and stay away, not to stop the insults. This treated the other boy as the problem, and the insults recurred at lunch." },
+        ],
+        cons: [
+          { agents: ["Cody", "Bella"], text: "NAH frames this as a misunderstanding. OP knowingly told a mother that her bullied son should toughen up. This was a choice made on the call, not an accident." },
+          { agents: ["Nathan", "Zoe"], text: "NAH would apply if OP lacked information. By the second call, OP knew their son had insulted the boy repeatedly. Blaming the classmate with that knowledge is a decision, not a mistake." },
+        ],
+      },
+    },
+  },
+  B: {
+    NTA: {
+      YTA: {
+        pros: [
+          { agents: ["Cody", "Bella"], text: "OP was walking home on a public pavement. The film crew cannot claim that space. OP is not required to step into the road so the shot works." },
+          { agents: ["Nathan", "Zoe"], text: "OP was walking home, the crew was in the way, and OP was asked to change course. OP continued on the same path, which is ignoring a demand, not creating a problem." },
+          { agents: ["Mario"], text: "OP had the same right to the pavement as anyone. Filming in a public place requires planning around passers-by, for example pausing for a few seconds." },
+        ],
+        cons: [
+          { agents: ["Bella"], text: "YTA omits how OP was treated first. OP was directed toward the road with an aggressive hand gesture, which is an order, not a request. Refusing it is not cruel." },
+          { agents: ["Zoe"], text: "YTA treats the request as small. OP was directed onto the road itself, where cars drive. Declining to walk there, even for a few meters, is reasonable." },
+        ],
+      },
+      ESH: {
+        pros: [
+          { agents: ["Cody", "Bella"], text: "The person pointing at the road was rude. OP walking past a camera on a public pavement is not a wrong. OP continued where they were already going and did nothing further." },
+          { agents: ["Zoe"], text: "OP was directed into the road. Declining to walk among traffic is not a fault. The only person who behaved badly is the one who pointed aggressively." },
+          { agents: ["Mario"], text: "The crew member was out of line, and OP did not owe the crew help with their video. The crew could have waited a moment for OP to pass." },
+        ],
+        cons: [
+          { agents: ["Bella"], text: "ESH counts the interrupted take against OP. Aggressive pointing is disrespectful. The crew being annoyed is not the same as being wronged, and OP's reaction was mild." },
+          { agents: ["Nathan", "Zoe"], text: "ESH requires OP to have done something additional, such as stopping in the shot or starting an argument. The post describes none of that. Sequence: the crew member was rude, then OP kept walking." },
+        ],
+      },
+      NAH: {
+        pros: [
+          { agents: ["Nathan", "Zoe"], text: "The crew chose to film on the pavement, then told OP to leave it for the road. Both steps placed the cost on OP. This was the crew's choice, not chance." },
+          { agents: ["Zoe"], text: "The person did not ask OP anything and pointed hard at the road. A polite request was an easy option, so skipping it is rudeness, not a misunderstanding." },
+          { agents: ["Mario"], text: "The crew had easy options, such as pausing for a few seconds while OP passed. Directing a pedestrian into the road put the video ahead of OP's safety." },
+        ],
+        cons: [
+          { agents: ["Cody", "Bella"], text: "NAH does not account for the person who gestured. Aggressively pointing a stranger toward the road is rude, not a mix-up, which puts that person in the wrong." },
+          { agents: ["Bella"], text: "NAH calls it nobody's fault. The person chose to wave OP toward the road with an aggressive gesture, and NAH excuses that treatment." },
+        ],
+      },
+    },
+    YTA: {
+      NTA: {
+        pros: [
+          { agents: ["Bella"], text: "Only one person made the rude gesture. Walking through the shot also spoiled the take for the person holding the camera, who had done nothing to OP." },
+          { agents: ["Nathan", "Zoe"], text: "Sequence: a crew member gestured rudely, then OP walked into the shot to ruin the filming. OP turned a brief rude moment into damage to someone's work." },
+          { agents: ["Mario"], text: "Even if the crew had no right to the pavement, OP had other options: wait a moment, object to the gesture, or walk behind the camera. Walking through the shot was the least fair option." },
+        ],
+        cons: [
+          { agents: ["Cody", "Bella"], text: "NTA does not account for OP admitting they walked in front of the camera on purpose, out of annoyance. That is not just using the pavement. It is ruining a video in retaliation for a gesture." },
+          { agents: ["Zoe"], text: "NTA treats the request as large. The detour was a few meters. Stepping around a shot for a few seconds is a small favor, and OP refused it in a way that ruined the filming." },
+        ],
+      },
+      ESH: {
+        pros: [
+          { agents: ["Nathan", "Zoe"], text: "The gesture was a request, even if rude, and cost OP nothing unless OP complied. Walking through the shot was an action with a real cost, which places the blame on OP." },
+          { agents: ["Zoe"], text: "OP states that the gesture made them angry, and that this led directly to walking in front of the camera. OP acted on purpose, in retaliation." },
+          { agents: ["Mario"], text: "Asking people to step around a shot is a normal request. Blunt delivery does not make it wrong. OP could have declined politely and kept walking." },
+        ],
+        cons: [
+          { agents: ["Cody", "Bella"], text: "ESH weighs a rude hand gesture against deliberately ruining someone's filming. The gesture is minor by comparison and does not put the crew member in the wrong." },
+          { agents: ["Bella"], text: "ESH blames the person gesturing. That person was likely focused on the shot and under some pressure, which explains the abrupt pointing. OP made the situation worse on purpose." },
+        ],
+      },
+      NAH: {
+        pros: [
+          { agents: ["Bella"], text: "Someone was putting effort into the video, and walking through the shot set that work back. Spoiling someone's work in response to feeling slighted is unkind." },
+          { agents: ["Zoe"], text: "The title states that OP ruined someone's filming, so OP knew the effect of the action. Ruining something on purpose is a wrong." },
+          { agents: ["Mario"], text: "OP was entitled to refuse the detour and walk normally. Deliberately stepping in front of the camera goes beyond refusing, to spoiling the crew's work." },
+        ],
+        cons: [
+          { agents: ["Cody", "Bella"], text: "NAH treats this as a clash of preferences. OP was asked for a detour of a few meters and walked into the shot instead. That is not an honest mistake." },
+          { agents: ["Nathan", "Zoe"], text: "NAH treats this as a mistake. OP lists two reasons for being annoyed, then states that these are why they walked in front of the camera. The sequence shows a deliberate decision." },
+        ],
+      },
+    },
+  },
+};
+
 // The 2nd and 4th agents open by agreeing with the agent who spoke just before
 // them. {name} is replaced by that agent's name. Set to "" to turn this off.
 const AGREE_PREFIX = "I agree with {name}. ";
 
 // The opening of the group chat, shown once at the start of the first chat (after the first post).
 const INTRO_LINES = {
-  welcome: "Welcome! We'll be discussing posts from Reddit's \"Am I the Asshole?\" community, starting with the one you just read. Before we start, let's all introduce ourselves!",
+  welcome: "Welcome! We'll be discussing the post from Reddit's \"Am I the Asshole?\" community that you just read. Before we start, let's all introduce ourselves!",
   ask_participant: "Now it's your turn. Could you please introduce yourself briefly in a single sentence?",
   participant_placeholder: "Introduce yourself in one sentence...",
-  thanks: "Thanks! Now that we know each other, we'll take turns to discuss our thoughts on these posts.",
+  thanks: "Thanks! Now that we know each other, let's discuss the post.",
 };
 
+// The intros above are shown only in the humanlike chat.
 const HOST_LINES = {
-  // Shown at the start of each discussion chat: the Host asks for the participant's verdict
+  // Shown at the start of each discussion chat (both styles): the Host asks for the participant's verdict
   ask_verdict: "Having read the post, what is your verdict: YTA (You're the Asshole), NTA (Not the Asshole), ESH (Everyone Sucks Here), or NAH (No Assholes Here)?",
-  // Asked right after the verdict; the participant types a sentence or two
-  ask_explanation: "Could you briefly explain your verdict in a sentence or two?",
-  explanation_placeholder: "Explain your verdict in a sentence or two (optional)...",
-  // Baseline: neutral line, shown after the verdict and before the agents
+  // Shown after the verdict and before the agents (both styles)
   neutral: "Here is what the agents think about this post.",
-  // Group 1: freedom-restoring line, shown after the verdict and before the agents
-  preemptive: "You might not agree with what you are about to hear, and that's completely okay. The agents just want to share one way of looking at it.",
-  // Group 2: freedom-restoring line, shown after the agents
-  post: "We respect your view, and thank you for considering theirs.",
-  // Group 2 only: optional line before the agents. null = agents start right away (as in the study figure).
-  post_intro: null,
 };
 
 const VERDICTS = [
@@ -178,21 +340,12 @@ const VERDICTS = [
   { code: "NAH", label: "NAH (No Assholes Here)" },
 ];
 
-// Perceived threat to freedom, adapted from Dillard & Shen (2005).
-// Check the wording against your LaTeX table before going live.
-const THREAT_ITEMS = [
-  { name: "threat_1", prompt: "The agents' messages threatened my freedom to choose." },
-  { name: "threat_2", prompt: "The agents' messages tried to make a decision for me." },
-  { name: "threat_3", prompt: "The agents' messages tried to manipulate me." },
-  { name: "threat_4", prompt: "The agents' messages tried to pressure me." },
-];
-const LIKERT_5 = ["Strongly disagree", "Disagree", "Neither agree nor disagree", "Agree", "Strongly agree"];
-
-// Added to the threat block of the second discussion. Correct answer = "Agree" (4).
-const ATTENTION_CHECK = {
-  name: "attention_check",
-  prompt: "To show you are reading carefully, please select \"Agree\" for this statement.",
-  correct: 4,
+// Asked after the final verdict of each post. {initial} and {final} are filled in.
+const REASON_QUESTION = {
+  changed: "You first said <b>{initial}</b> and your final verdict is <b>{final}</b>. Why did you change your verdict?",
+  unchanged: "You said <b>{initial}</b> both times. Why did you keep your verdict?",
+  placeholder: "Explain in a sentence or two...",
+  min_chars: 5,
 };
 
 const TEXT = {
@@ -202,10 +355,8 @@ const TEXT = {
   instructions: `<h2>Instructions</h2>
     <p>You will read two posts from Reddit's "Am I the Asshole?" (AITA) community and
     discuss each one in a group chat with a Host and five AI agents.</p>
-    <p>After the first post, everyone in the chat will introduce themselves, and you will
-    be asked to introduce yourself in one sentence. For each post you will then give your
-    verdict, explain it in a sentence or two, read what the agents think, and answer a
-    few questions.</p>`,
+    <p>For each post you will give your verdict in the chat, see what the agents think,
+    and then give your final verdict and say why you did or did not change it.</p>`,
   read_post: "Please read this post carefully. You will give your verdict in the group chat next.",
   debrief: `<h2>Thank you!</h2>
     <p>Thank you for participating in the survey.</p>`,

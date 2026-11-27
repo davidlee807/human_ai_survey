@@ -4,41 +4,38 @@ Open `index.html` in a browser to try it. All libraries are in `lib/`, so it nee
 
 ## What to edit
 
-- `src/content.js`: the two AITA posts, the agents' self-introductions and the Host's opening lines (`INTRO_LINES`), the five agents' explanations (`agent_messages[agent verdict][participant verdict][agent]`, six per agent per post), the Host lines, the survey items, and the consent and debrief text. Search for `[PLACEHOLDER]`.
-- `src/config.js`: your DataPipe ID, your Prolific completion code, and the typing speed.
+- `src/content.js`: the two AITA posts, the agents' self-introductions and the Host's opening lines (`INTRO_LINES`), the five agents' humanlike messages (`agent_messages[agent verdict][participant verdict][agent]`), the factual pros/cons lists (`FACTUAL_LISTS[post][agent verdict][participant verdict]`), the Host lines, the "why did you change / keep your verdict" question (`REASON_QUESTION`), and the consent and debrief text. Search for `[PLACEHOLDER]`.
+- `src/config.js`: the Google Sheets URL, your Prolific completion code, and the typing speed.
 
-Participants choose from four verdicts: YTA, NTA, ESH (everyone sucks here), and NAH (no assholes here). The agents' verdict depends on the participant's first verdict on that post: YTA gets NTA, NTA gets YTA, and ESH or NAH gets YTA or NTA at random (50/50). Each agent has its own explanation for every pair of agent verdict and participant verdict, so there are three YTA explanations (replying to NTA, ESH or NAH) and three NTA explanations (replying to YTA, ESH or NAH) per agent and post.
+Participants choose from four verdicts: YTA, NTA, ESH (everyone sucks here), and NAH (no assholes here). The agents always argue against the participant's first verdict on that post: YTA gets NTA, NTA gets YTA, and ESH or NAH gets YTA or NTA at random (50/50).
 
-## Conditions
+## Conditions (within subjects)
 
-Every participant reads both posts. The chat page differs by condition:
+Every participant reads both posts and sees both agent styles, one per post. The arguments are the same in both styles; only the presentation differs.
 
-In every condition the discussion chat opens with the Host asking for the participant's verdict (YTA, NTA, ESH, or NAH), which they give with buttons in the chat, followed by a typed explanation of a sentence or two. What follows depends on the condition:
-
-| Condition | Chat shown after the verdict |
+| Style | Chat after the participant's verdict |
 |---|---|
-| baseline | Host neutral line, then the 5 agents |
-| preemptive (Group 1) | Host freedom-restoring line, then the 5 agents |
-| post (Group 2) | the 5 agents, then the Host freedom-restoring line |
+| humanlike | The chat opens with introductions (Host welcome, each named agent, the participant types a one-sentence intro). After the verdict, the Host line, then the 5 named agents each post their message. The 2nd and 4th open with "I agree with <previous agent>." |
+| factual | No introductions. After the verdict, the Host line, then one machine-style list: the agents' verdict, PROS (points for the agents' verdict) and CONS (points against the participant's verdict), each point marked with the agents that agree with it (Agent 1 to 5). |
 
-Every participant does the baseline first: Discussion 1 is always the baseline, and Discussion 2 uses the participant's group (preemptive or post). Each participant is put into one of 4 cells: group (preemptive / post) × which post comes first (A / B).
+Each factual point is one agent's humanlike message, and the 2nd and 4th agents are also listed on the point of the agent before them, matching "I agree with …" in the humanlike chat.
 
-| cell | group | first post (baseline) | second post (group condition) |
-|---|---|---|---|
-| 0 | preemptive | A | B |
-| 1 | post | A | B |
-| 2 | preemptive | B | A |
-| 3 | post | B | A |
+Each participant is put into one of 4 cells: which style comes first × which post comes first. This balances both the style order and which post gets which style.
+
+| cell | Discussion 1 | Discussion 2 |
+|---|---|---|
+| 0 | factual, post A | humanlike, post B |
+| 1 | humanlike, post A | factual, post B |
+| 2 | factual, post B | humanlike, post A |
+| 3 | humanlike, post B | factual, post A |
 
 To test a specific cell, add `?cell=3` to the URL.
 
 ## Flow
 
-Consent → instructions → for each post: read the post → chat → perceived threat (4 items, 1–5; the attention check is mixed into the second set) → final verdict → save data → thank-you page → redirect to Prolific.
+Consent → instructions → for each post: read the post → chat (verdict given with buttons in the chat) → final verdict → "Why did you change / keep your verdict?" (free text, required) → save data → thank-you page → redirect to Prolific.
 
-The first chat opens with introductions: the Host welcomes everyone, each agent introduces themselves, and the participant types a one-sentence intro. Then, in every chat, the Host asks for the verdict (four buttons), the participant types a sentence or two explaining it, and the Host line and agents follow by condition.
-
-A reminder of what YTA, NTA, ESH and NAH mean stays at the top of the page from the first post on. The 2nd and 4th agents open with "I agree with <previous agent>." (`AGREE_PREFIX` in `src/content.js`). The explanation after the verdict is optional.
+A reminder of what YTA, NTA, ESH and NAH mean stays at the top of the page from the first post on.
 
 ## Saving responses (Google Sheets)
 
@@ -58,11 +55,9 @@ The URL only lets the page add rows and ask for a cell; it can't read your Sheet
 
 ## Data
 
-Two CSV files are saved for each participant:
-- `<id>_summary.csv`: one row with group, cell, and for each discussion the post, condition, initial and final verdict, the agents' verdict, `changed` (final verdict is the one the agents argued), `verdict_changed` (any change of verdict), the four threat items, the threat mean, plus `attention_pass`, `self_intro` (the sentence the participant typed), and each discussion's `explanation`. Timing (all in ms): `consent_ms`, `instructions_ms`, and per discussion `read_post_ms`, `chat_ms`, `threat_ms`, `final_verdict_ms`, plus `total_time_ms`, `started_at`, `finished_at`. Also `is_mobile` and per discussion `tab_switches` (times the participant left the tab). This is the same row the Google Sheet gets. Stack these files for the analysis.
-- `<id>_trials.csv`: every screen with timestamps, response times, and the exact chat messages that were shown.
+One row per participant (the `summary` tab of the Google Sheet): `cell`, `group` (`factual_first` or `humanlike_first`), `first_style`, `first_post`, and for each discussion (`d1_`, `d2_`): `post`, `style`, `initial`, `agent_verdict`, `final`, `changed` (final verdict is the one the agents argued), `verdict_changed` (any change of verdict), `reason` (why they changed or kept it), and the times in ms `read_post_ms`, `chat_ms`, `final_verdict_ms`, `reason_ms`, plus `tab_switches`. Also `self_intro` (typed in the humanlike chat), `consent_ms`, `instructions_ms`, `total_time_ms`, `started_at`, `finished_at` and `is_mobile`.
 
-If no DataPipe ID is set, nothing is saved. For testing, add `?download=1` to the URL and both files download at the end.
+For testing without the Sheet, clear `GOOGLE_SHEETS_URL` and add `?download=1` to the URL to download the data at the end.
 
 ## Going live (free)
 
@@ -83,4 +78,4 @@ Cognition.run hosts the study and saves the data, so you don't need GitHub Pages
 4. Open **Source code** and paste in all of `cognition/task.js`. The posts and messages are in the `src/content.js` section of that file, so you can edit them right there. Or edit `src/` and run `sh cognition/build.sh` to regenerate the file.
 5. Use the preview's **Set condition** option to check each of the 4 conditions.
 6. In Prolific, set the study URL to `<your task URL>?PROLIFIC_PID={{%PROLIFIC_PID%}}&STUDY_ID={{%STUDY_ID%}}&SESSION_ID={{%SESSION_ID%}}`, and put your completion code in the `CONFIG` section. At the end, participants get a "Return to Prolific" button.
-7. Download the data from the task's dashboard as CSV. You get one row per screen. The `final_verdict` rows have `changed_to_agents`, and the `threat` rows have `threat_mean`. (The one-row summary file is only made in the GitHub Pages + DataPipe setup.)
+7. Download the data from the task's dashboard as CSV. You get one row per screen. The `final_verdict` rows have `changed_to_agents`, and the `reason` rows have the participant's reason. (The one-row summary file is only made in the GitHub Pages + DataPipe setup.)

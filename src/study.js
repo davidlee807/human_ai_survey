@@ -48,12 +48,15 @@ async function getCell() {
   return Math.floor(Math.random() * N_CELLS);
 }
 
-// Cells are group (preemptive / post) x which post comes first (A / B).
-// The baseline is always Discussion 1, so the second discussion carries the group's condition.
+// Within subjects: everyone sees both styles, one per post. The 4 cells are
+// which style comes first (factual / humanlike) x which post comes first (A / B),
+// so both the style order and which post gets which style are balanced.
+//   cell 0: factual on A, then humanlike on B     cell 2: factual on B, then humanlike on A
+//   cell 1: humanlike on A, then factual on B     cell 3: humanlike on B, then factual on A
 function decodeCell(cell) {
-  const group = cell % 2 === 0 ? "preemptive" : "post";
+  const firstStyle = cell % 2 === 0 ? "factual" : "humanlike";
   const firstPost = Math.floor(cell / 2) % 2 === 0 ? "A" : "B";
-  return { cell, group, firstPost };
+  return { cell, group: `${firstStyle}_first`, firstStyle, firstPost };
 }
 
 function postHtml(post) {
@@ -68,7 +71,7 @@ const verdictButtons = {
 
 const host = (text) => ({ name: HOST.name, color: HOST.color, role: "host", text });
 
-// Opens the first chat, after the first post: Host welcome, each agent's intro, then the participant's.
+// Opens the humanlike chat: Host welcome, each agent's intro, then the participant's.
 function introScript() {
   return [
     host(INTRO_LINES.welcome),
@@ -79,32 +82,48 @@ function introScript() {
   ];
 }
 
-// Host asks for the verdict and a short explanation, then (by condition) the Host line and the agents arguing against it.
-function discussionScript(postId, condition) {
+const escapeHtml = (str) => String(str).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+// The factual condition's single message: the pros/cons list with the agents that agree with each point.
+function factualMessage(postId, agentVerdict, verdict) {
+  const list = FACTUAL_LISTS[postId][agentVerdict][verdict];
+  const who = (p) => p.agents.map((n) => FACTUAL.labels[n] || n).join(", ");
+  const items = (points) => points.map((p) => `<li>${escapeHtml(p.text)}<span class="fl-agents">Agreed by: ${who(p)} (${p.agents.length}/${AGENTS.length})</span></li>`).join("");
+  const verdictLine = `Verdict: ${agentVerdict} (${AGENTS.length}/${AGENTS.length} agents)`;
+  const prosHead = `PROS: points for ${agentVerdict}`;
+  const consHead = `CONS: points against ${verdict}`;
+  const html = `<div class="factual"><div class="fl-verdict">${verdictLine}</div>
+    <div class="fl-head">${prosHead}</div><ul>${items(list.pros)}</ul>
+    <div class="fl-head">${consHead}</div><ul>${items(list.cons)}</ul></div>`;
+  const plain = (points) => points.map((p) => `- ${p.text} [Agreed by: ${who(p)}]`).join("\n");
+  const text = `${verdictLine}\n${prosHead}\n${plain(list.pros)}\n${consHead}\n${plain(list.cons)}`;
+  return { name: FACTUAL.sender, color: FACTUAL.color, role: "system", text, html };
+}
+
+// Host asks for the verdict, then the agents argue against it: in the humanlike style each
+// agent posts its message, in the factual style one pros/cons list is shown.
+function discussionScript(postId, style) {
   return [
     host(HOST_LINES.ask_verdict),
     { input: "choice", key: "verdict", choices: VERDICTS.map((v) => ({ label: v.label, value: v.code, say: v.code })) },
-    host(HOST_LINES.ask_explanation),
-    { input: "text", key: "explanation", placeholder: HOST_LINES.explanation_placeholder, min_chars: 0, max_chars: 600 },
     (r) => {
       r.agent_verdict = agentVerdictFor(r.verdict);
-      const agentMsgs = AGENTS.map((a, i) => ({
+      if (style === "factual") return [host(HOST_LINES.neutral), factualMessage(postId, r.agent_verdict, r.verdict)];
+      return [host(HOST_LINES.neutral), ...AGENTS.map((a, i) => ({
         name: a.name, color: a.color, role: "agent",
         text: (i === 1 || i === 3 ? AGREE_PREFIX.replace("{name}", AGENTS[i - 1].name) : "") +
           POSTS[postId].agent_messages[r.agent_verdict][r.verdict][a.name],
-      }));
-      if (condition === "baseline") return [host(HOST_LINES.neutral), ...agentMsgs];
-      if (condition === "preemptive") return [host(HOST_LINES.preemptive), ...agentMsgs];
-      return [...(HOST_LINES.post_intro ? [host(HOST_LINES.post_intro)] : []), ...agentMsgs, host(HOST_LINES.post)];
+      }))];
     },
   ];
 }
 
 function discussionBlock(d) {
   const post = POSTS[d.postId];
-  const tag = { discussion: d.n, post_id: d.postId, condition: d.condition };
+  const tag = { discussion: d.n, post_id: d.postId, style: d.style };
   let initialVerdict = null;
   let agentVerdict = null;
+  let finalVerdict = null;
 
   const read = {
     type: jsPsychHtmlButtonResponse,
@@ -114,37 +133,20 @@ function discussionBlock(d) {
     data: { ...tag, measure: "read_post" },
   };
 
-  // The initial verdict and explanation are given in the chat (and, in the first chat,
-  // the introductions), so this trial also holds them.
+  // The initial verdict is given in the chat (and, in the humanlike chat, the
+  // introductions), so this trial also holds them.
   const chat = {
     type: jsPsychChat,
     context_html: postHtml(post),
-    script: [...(d.n === 1 ? introScript() : []), ...discussionScript(d.postId, d.condition)],
+    script: [...(d.style === "humanlike" ? introScript() : []), ...discussionScript(d.postId, d.style)],
     typing: CONFIG.TYPING,
     data: { ...tag, measure: "chat" },
     on_finish: (data) => {
       initialVerdict = data.responses.verdict;
       data.verdict = initialVerdict;
-      data.explanation = data.responses.explanation;
-      if (d.n === 1) data.self_intro = data.responses.self_intro;
+      if (d.style === "humanlike") data.self_intro = data.responses.self_intro;
       agentVerdict = data.responses.agent_verdict;
       data.agent_verdict = agentVerdict;
-    },
-  };
-
-  const items = THREAT_ITEMS.map((q) => ({ ...q, labels: LIKERT_5, required: true }));
-  if (d.n === 2) items.push({ ...ATTENTION_CHECK, labels: LIKERT_5, required: true });
-  const threat = {
-    type: jsPsychSurveyLikert,
-    preamble: "<p>Think about the discussion you just read. How much do you agree with each statement?</p>",
-    questions: items,
-    randomize_question_order: true,
-    data: { ...tag, measure: "threat" },
-    on_finish: (data) => {
-      const scores = THREAT_ITEMS.map((q) => data.response[q.name] + 1); // 1-5
-      THREAT_ITEMS.forEach((q, i) => { data[q.name] = scores[i]; });
-      data.threat_mean = scores.reduce((a, b) => a + b, 0) / scores.length;
-      if (d.n === 2) data.attention_pass = data.response[ATTENTION_CHECK.name] + 1 === ATTENTION_CHECK.correct;
     },
   };
 
@@ -156,6 +158,7 @@ function discussionBlock(d) {
     data: { ...tag, measure: "final_verdict" },
     on_finish: (data) => {
       data.verdict = VERDICTS[data.response].code;
+      finalVerdict = data.verdict;
       data.initial_verdict = initialVerdict;
       data.verdict_changed = data.verdict !== initialVerdict;
       data.agent_verdict = agentVerdict;
@@ -164,7 +167,35 @@ function discussionBlock(d) {
     },
   };
 
-  return [read, chat, threat, final];
+  // Why the participant changed or kept their verdict (free text, required).
+  let reasonText = "";
+  const reason = {
+    type: jsPsychHtmlButtonResponse,
+    stimulus: () => {
+      const q = (finalVerdict === initialVerdict ? REASON_QUESTION.unchanged : REASON_QUESTION.changed)
+        .replace("{initial}", initialVerdict).replace("{final}", finalVerdict);
+      return `<p><b>${q}</b></p><textarea id="reason-box" class="reason-box" maxlength="1000" placeholder="${REASON_QUESTION.placeholder}"></textarea>`;
+    },
+    choices: ["Continue"],
+    data: { ...tag, measure: "reason" },
+    on_load: () => {
+      reasonText = "";
+      const box = document.getElementById("reason-box");
+      const btn = jsPsych.getDisplayElement().querySelector("button.jspsych-btn");
+      const update = () => {
+        reasonText = box.value.trim();
+        if (btn) btn.disabled = reasonText.length < REASON_QUESTION.min_chars;
+      };
+      box.addEventListener("input", update);
+      update();
+      box.focus();
+    },
+    on_finish: (data) => {
+      data.reason = reasonText;
+    },
+  };
+
+  return [read, chat, final, reason];
 }
 
 // One row per participant, ready for analysis. This is all that goes to the Google Sheet.
@@ -175,7 +206,7 @@ function summaryRow(info) {
   const row = {
     participant_id: participantId, prolific_pid: url.PROLIFIC_PID || "", study_id: url.STUDY_ID || "",
     session_id: url.SESSION_ID || "", cell: info.cell, group: info.group,
-    first_post: info.firstPost,
+    first_style: info.firstStyle, first_post: info.firstPost,
     started_at: one({ measure: "consent" }).timestamp,
     finished_at: new Date().toISOString(),
     is_mobile: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent),
@@ -184,28 +215,25 @@ function summaryRow(info) {
   };
   [1, 2].forEach((n) => {
     const get = (measure) => one({ discussion: n, measure });
-    const r = get("read_post"), c = get("chat"), th = get("threat"), f = get("final_verdict");
+    const r = get("read_post"), c = get("chat"), f = get("final_verdict"), why = get("reason");
     row[`d${n}_post`] = f.post_id;
-    row[`d${n}_condition`] = f.condition;
+    row[`d${n}_style`] = f.style;
     row[`d${n}_initial`] = f.initial_verdict;
-    row[`d${n}_explanation`] = c.explanation;
     row[`d${n}_agent_verdict`] = f.agent_verdict;
     row[`d${n}_final`] = f.verdict;
     row[`d${n}_changed`] = f.changed_to_agents;
     row[`d${n}_verdict_changed`] = f.verdict_changed;
-    THREAT_ITEMS.forEach((q) => { row[`d${n}_${q.name}`] = th[q.name]; });
-    row[`d${n}_threat_mean`] = th.threat_mean;
-    if (n === 2) row.attention_pass = th.attention_pass;
+    row[`d${n}_reason`] = why.reason;
     row[`d${n}_read_post_ms`] = r.rt;
     row[`d${n}_chat_ms`] = c.rt;
-    row[`d${n}_threat_ms`] = th.rt;
     row[`d${n}_final_verdict_ms`] = f.rt;
+    row[`d${n}_reason_ms`] = why.rt;
     // Times the participant left the tab or window while on this post's pages.
-    const idx = new Set([r, c, th, f].map((t) => t.trial_index));
+    const idx = new Set([r, c, f, why].map((t) => t.trial_index));
     row[`d${n}_tab_switches`] = jsPsych.data.getInteractionData()
       .filter({ event: "blur" }).values().filter((e) => idx.has(e.trial)).length;
   });
-  row.self_intro = one({ discussion: 1, measure: "chat" }).self_intro;
+  row.self_intro = one({ style: "humanlike", measure: "chat" }).self_intro;
   row.total_time_ms = all.last(1).values()[0].time_elapsed;
   return row;
 }
@@ -240,15 +268,16 @@ async function main() {
   const info = decodeCell(await getCell());
   document.getElementById("loading-msg")?.remove();
   const secondPost = info.firstPost === "A" ? "B" : "A";
+  const secondStyle = info.firstStyle === "factual" ? "humanlike" : "factual";
   const discussions = [
-    { n: 1, postId: info.firstPost, condition: "baseline" },
-    { n: 2, postId: secondPost, condition: info.group },
+    { n: 1, postId: info.firstPost, style: info.firstStyle },
+    { n: 2, postId: secondPost, style: secondStyle },
   ];
 
   jsPsych.data.addProperties({
     participant_id: participantId, prolific_pid: url.PROLIFIC_PID || "", study_id: url.STUDY_ID || "",
     session_id: url.SESSION_ID || "", cell: info.cell, group: info.group,
-    first_post: info.firstPost,
+    first_style: info.firstStyle, first_post: info.firstPost,
   });
 
   const consent = {

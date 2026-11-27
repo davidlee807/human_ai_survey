@@ -46,3 +46,14 @@ body { background: #f4f4f2; }
 .verdict-key { display: none; position: sticky; top: 0; z-index: 10; background: #fff; border-bottom: 1px solid #ddd;
   padding: 6px 16px; font-size: 14px; color: #444; text-align: center; line-height: 1.6; }
 .show-verdict-key .verdict-key { display: block; }
+
+/* Factual condition: one machine-style pros/cons list */
+.msg-system .avatar { font-size: 12px; border-radius: 6px; }
+.msg-system .bubble { max-width: 88%; border-radius: 6px; background: #f7f8fa; }
+.factual { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 14px; line-height: 1.5; }
+.factual .fl-verdict { font-weight: 700; margin-bottom: 6px; }
+.factual .fl-head { font-weight: 700; margin-top: 8px; }
+.factual ul { margin: 4px 0 0; padding-left: 18px; }
+.factual li { margin-bottom: 6px; }
+.factual .fl-agents { display: block; color: #555; font-size: 13px; }
+.reason-box { width: 100%; box-sizing: border-box; min-height: 90px; font-size: 16px; padding: 10px 12px; border: 1px solid #bbb; border-radius: 8px; }

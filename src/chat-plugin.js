@@ -12,7 +12,8 @@ var jsPsychChat = (function (jspsych) {
       context_html: { type: jspsych.ParameterType.HTML_STRING, default: "" },
       context_label: { type: jspsych.ParameterType.STRING, default: "Show the post again" },
       // Steps played in order. Each step is one of:
-      //   { name, color, role: "host" | "agent", text }                 a message
+      //   { name, color, role: "host" | "agent" | "system", text, html }  a message
+      //                       (html, if given, is shown instead of text; text is what gets logged)
       //   { input: "text", key, placeholder, min_chars, max_chars }     participant types a reply
       //   { input: "choice", key, choices: [{ label, value, say }] }    participant clicks a button
       //   (responses) => [steps]   steps built from earlier replies, e.g. agents answering the verdict
@@ -69,7 +70,7 @@ var jsPsychChat = (function (jspsych) {
         const row = document.createElement("div");
         row.className = `msg msg-${m.role || "agent"}`;
         row.innerHTML = `
-          <div class="avatar" style="background:${m.color}">${m.role === "host" ? "Host" : m.name[0]}</div>
+          <div class="avatar" style="background:${m.color}">${m.role === "host" ? "Host" : m.role === "system" ? "AI" : m.name[0]}</div>
           <div class="bubble"><div class="name" style="color:${m.role === "host" ? "inherit" : m.color}">${m.name}</div><div class="text"><span class="typing"><i></i><i></i><i></i></span></div></div>`;
         log.appendChild(row);
         scroll();
@@ -109,7 +110,8 @@ var jsPsychChat = (function (jspsych) {
         const indicator = Math.min(t.indicator_max, Math.max(t.indicator_min, m.text.length * t.indicator_ms_per_char));
         // Show the typing dots, then the whole message at once
         later(() => {
-          textEl.textContent = m.text;
+          if (m.html) textEl.innerHTML = m.html;
+          else textEl.textContent = m.text;
           scroll();
           later(next, t.pause_after_message);
         }, indicator);
