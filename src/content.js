@@ -159,9 +159,8 @@ const POSTS = {
 // humanlike condition, and the 2nd and 4th agents are also listed on the point of the
 // agent before them, which mirrors "I agree with Cody/Nathan" in the humanlike chat.
 const FACTUAL = {
-  // Shown as the sender of the list in the chat.
-  sender: "Agent output",
-  color: "#6b7280",
+  // Heading of the pros/cons page (the factual condition has no chat and no Host).
+  title: "AI agents' analysis",
   // How each agent is named in the list. Neutral labels, so the factual chat has no names.
   labels: { Cody: "Agent 1", Bella: "Agent 2", Nathan: "Agent 3", Zoe: "Agent 4", Mario: "Agent 5" },
 };
@@ -351,10 +350,13 @@ const REASON_QUESTION = {
 const TEXT = {
   instructions: `<h2>Instructions</h2>
     <p>You will read two posts from Reddit's "Am I the Asshole?" (AITA) community and
-    discuss each one in a group chat with a Host and five AI agents.</p>
-    <p>For each post you will give your verdict in the chat, see what the agents think,
+    see what five AI agents think about each one. For one post the agents discuss
+    it with you in a group chat; for the other they give a list of points.</p>
+    <p>For each post you will give your verdict, see what the agents think,
     and then give your final verdict and say why you did or did not change it.</p>`,
   read_post: "Please read this post carefully. You will give your verdict in the group chat next.",
+  // Factual condition: shown under the post, above the four verdict buttons
+  factual_verdict: "Please read this post carefully. What is your verdict?",
   debrief: `<h2>Thank you!</h2>
     <p>Thank you for participating in the survey.</p>`,
   // Shown at the top of every page from the first post on, as a reminder of the verdicts

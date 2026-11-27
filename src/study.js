@@ -85,31 +85,26 @@ function introScript() {
 
 const escapeHtml = (str) => String(str).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-// The factual condition's single message: the pros/cons list with the agents that agree with each point.
-function factualMessage(postId, agentVerdict, verdict) {
+// The factual condition's list page: the agents' verdict, then PROS and CONS, each point
+// with the agents that agree with it. Shown as a plain page, not in the chat.
+function factualListHtml(postId, agentVerdict, verdict) {
   const list = FACTUAL_LISTS[postId][agentVerdict][verdict];
   const who = (p) => p.agents.map((n) => FACTUAL.labels[n] || n).join(", ");
   const items = (points) => points.map((p) => `<li>${escapeHtml(p.text)}<span class="fl-agents">Agreed by: ${who(p)} (${p.agents.length}/${AGENTS.length})</span></li>`).join("");
-  const verdictLine = `Verdict: ${agentVerdict} (${AGENTS.length}/${AGENTS.length} agents)`;
-  const prosHead = `PROS: points for ${agentVerdict}`;
-  const consHead = `CONS: points against ${verdict}`;
-  const html = `<div class="factual"><div class="fl-verdict">${verdictLine}</div>
-    <div class="fl-head">${prosHead}</div><ul>${items(list.pros)}</ul>
-    <div class="fl-head">${consHead}</div><ul>${items(list.cons)}</ul></div>`;
-  const plain = (points) => points.map((p) => `- ${p.text} [Agreed by: ${who(p)}]`).join("\n");
-  const text = `${verdictLine}\n${prosHead}\n${plain(list.pros)}\n${consHead}\n${plain(list.cons)}`;
-  return { name: FACTUAL.sender, color: FACTUAL.color, role: "system", text, html };
+  return `<details class="chat-context"><summary>Show the post again</summary>${postHtml(POSTS[postId])}</details>
+    <div class="factual factual-page"><div class="fl-title">${FACTUAL.title}</div>
+    <div class="fl-verdict">Verdict: ${agentVerdict} (${AGENTS.length}/${AGENTS.length} agents)</div>
+    <div class="fl-head">PROS: points for ${agentVerdict}</div><ul>${items(list.pros)}</ul>
+    <div class="fl-head">CONS: points against ${verdict}</div><ul>${items(list.cons)}</ul></div>`;
 }
 
-// Host asks for the verdict, then the agents argue against it: in the humanlike style each
-// agent posts its message, in the factual style one pros/cons list is shown.
-function discussionScript(postId, style) {
+// Humanlike chat: Host asks for the verdict, then the five named agents argue against it.
+function discussionScript(postId) {
   return [
     host(HOST_LINES.ask_verdict),
     { input: "choice", key: "verdict", choices: VERDICTS.map((v) => ({ label: v.label, value: v.code, say: v.code })) },
     (r) => {
       r.agent_verdict = agentVerdictFor(r.verdict);
-      if (style === "factual") return [host(HOST_LINES.neutral), factualMessage(postId, r.agent_verdict, r.verdict)];
       return [host(HOST_LINES.neutral), ...AGENTS.map((a, i) => ({
         name: a.name, color: a.color, role: "agent",
         text: (i === 1 || i === 3 ? AGREE_PREFIX.replace("{name}", AGENTS[i - 1].name) : "") +
@@ -134,21 +129,42 @@ function discussionBlock(d) {
     data: { ...tag, measure: "read_post" },
   };
 
-  // The initial verdict is given in the chat (and, in the humanlike chat, the
-  // introductions), so this trial also holds them.
+  // Humanlike: the initial verdict is given in the chat (after the introductions),
+  // so this trial also holds it.
   const chat = {
     type: jsPsychChat,
     context_html: postHtml(post),
-    script: [...(d.style === "humanlike" ? introScript() : []), ...discussionScript(d.postId, d.style)],
+    script: [...introScript(), ...discussionScript(d.postId)],
     typing: CONFIG.TYPING,
-    data: { ...tag, measure: "chat" },
+    data: { ...tag, measure: "agents" },
     on_finish: (data) => {
       initialVerdict = data.responses.verdict;
       data.verdict = initialVerdict;
-      if (d.style === "humanlike") data.self_intro = data.responses.self_intro;
+      data.self_intro = data.responses.self_intro;
       agentVerdict = data.responses.agent_verdict;
       data.agent_verdict = agentVerdict;
     },
+  };
+
+  // Factual: the post with the four verdict buttons on one page, then the pros/cons list page.
+  const readAndVote = {
+    type: jsPsychHtmlButtonResponse,
+    on_start: () => document.body.classList.add("show-verdict-key"),
+    stimulus: `<p class="step">Post ${d.n} of 2</p>${postHtml(post)}<p><b>${TEXT.factual_verdict}</b></p>`,
+    ...verdictButtons,
+    data: { ...tag, measure: "read_post" },
+    on_finish: (data) => {
+      initialVerdict = VERDICTS[data.response].code;
+      data.verdict = initialVerdict;
+      agentVerdict = agentVerdictFor(initialVerdict);
+      data.agent_verdict = agentVerdict;
+    },
+  };
+  const factualList = {
+    type: jsPsychHtmlButtonResponse,
+    stimulus: () => factualListHtml(d.postId, agentVerdict, initialVerdict),
+    choices: ["Continue"],
+    data: { ...tag, measure: "agents" },
   };
 
   const final = {
@@ -196,7 +212,8 @@ function discussionBlock(d) {
     },
   };
 
-  return [read, chat, final, reason];
+  const shown = d.style === "factual" ? [readAndVote, factualList] : [read, chat];
+  return [...shown, final, reason];
 }
 
 // One row per participant, ready for analysis. This is all that goes to the Google Sheet.
@@ -215,7 +232,7 @@ function summaryRow(info) {
   };
   [1, 2].forEach((n) => {
     const get = (measure) => one({ discussion: n, measure });
-    const r = get("read_post"), c = get("chat"), f = get("final_verdict"), why = get("reason");
+    const r = get("read_post"), c = get("agents"), f = get("final_verdict"), why = get("reason");
     row[`d${n}_post`] = f.post_id;
     row[`d${n}_style`] = f.style;
     row[`d${n}_initial`] = f.initial_verdict;
@@ -225,7 +242,7 @@ function summaryRow(info) {
     row[`d${n}_verdict_changed`] = f.verdict_changed;
     row[`d${n}_reason`] = why.reason;
     row[`d${n}_read_post_ms`] = r.rt;
-    row[`d${n}_chat_ms`] = c.rt;
+    row[`d${n}_agents_ms`] = c.rt; // time on the chat (humanlike) or the pros/cons list (factual)
     row[`d${n}_final_verdict_ms`] = f.rt;
     row[`d${n}_reason_ms`] = why.rt;
     // Times the participant left the tab or window while on this post's pages.
@@ -233,7 +250,7 @@ function summaryRow(info) {
     row[`d${n}_tab_switches`] = jsPsych.data.getInteractionData()
       .filter({ event: "blur" }).values().filter((e) => idx.has(e.trial)).length;
   });
-  row.self_intro = one({ style: "humanlike", measure: "chat" }).self_intro;
+  row.self_intro = one({ style: "humanlike", measure: "agents" }).self_intro;
   row.total_time_ms = all.last(1).values()[0].time_elapsed;
   return row;
 }

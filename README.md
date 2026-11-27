@@ -16,7 +16,7 @@ Every participant reads both posts and sees both agent styles, one per post. The
 | Style | Chat after the participant's verdict |
 |---|---|
 | humanlike | The chat opens with introductions (Host welcome, each named agent, the participant types a one-sentence intro). After the verdict, the Host line, then the 5 named agents each post their message. The 2nd and 4th open with "I agree with <previous agent>." |
-| factual | No introductions. After the verdict, the Host line, then one machine-style list: the agents' verdict, PROS (points for the agents' verdict) and CONS (points against the participant's verdict), each point marked with the agents that agree with it (Agent 1 to 5). |
+| factual | No chat and no Host. The post is shown with the four verdict buttons under it. Then a separate page (not a chat) shows the agents' analysis: the agents' verdict (5/5), PROS (points for the agents' verdict) and CONS (points against the participant's verdict), each point marked with the agents that agree with it (Agent 1 to 5), all at once. |
 
 Each factual point is one agent's humanlike message, and the 2nd and 4th agents are also listed on the point of the agent before them, matching "I agree with …" in the humanlike chat.
 
@@ -33,7 +33,7 @@ To test a specific cell, add `?cell=3` to the URL.
 
 ## Flow
 
-Instructions → for each post: read the post → chat (verdict given with buttons in the chat) → final verdict → "Why did you change / keep your verdict?" (free text, required) → save data → thank-you page → redirect to Prolific.
+Instructions → for each post: humanlike: read the post → chat (verdict given with buttons in the chat); factual: post with verdict buttons → pros/cons page; then → final verdict → "Why did you change / keep your verdict?" (free text, required) → save data → thank-you page → redirect to Prolific.
 
 A reminder of what YTA, NTA, ESH and NAH mean stays at the top of the page from the first post on.
 
@@ -55,7 +55,7 @@ The URL only lets the page add rows and ask for a cell; it can't read your Sheet
 
 ## Data
 
-One row per participant (the `summary` tab of the Google Sheet): `cell`, `group` (`factual_first` or `humanlike_first`), `first_style`, `first_post`, and for each discussion (`d1_`, `d2_`): `post`, `style`, `initial`, `agent_verdict`, `final`, `changed` (final verdict is the one the agents argued), `verdict_changed` (any change of verdict), `reason` (why they changed or kept it), and the times in ms `read_post_ms`, `chat_ms`, `final_verdict_ms`, `reason_ms`, plus `tab_switches`. Also `self_intro` (typed in the humanlike chat), `instructions_ms`, `total_time_ms`, `started_at` (page opened), `finished_at` and `is_mobile`.
+One row per participant (the `summary` tab of the Google Sheet): `cell`, `group` (`factual_first` or `humanlike_first`), `first_style`, `first_post`, and for each discussion (`d1_`, `d2_`): `post`, `style`, `initial`, `agent_verdict`, `final`, `changed` (final verdict is the one the agents argued), `verdict_changed` (any change of verdict), `reason` (why they changed or kept it), and the times in ms `read_post_ms` (factual: includes giving the verdict), `agents_ms` (time on the chat or the pros/cons page), `final_verdict_ms`, `reason_ms`, plus `tab_switches`. Also `self_intro` (typed in the humanlike chat), `instructions_ms`, `total_time_ms`, `started_at` (page opened), `finished_at` and `is_mobile`.
 
 For testing without the Sheet, clear `GOOGLE_SHEETS_URL` and add `?download=1` to the URL to download the data at the end.
 
