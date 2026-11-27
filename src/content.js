@@ -349,9 +349,6 @@ const REASON_QUESTION = {
 };
 
 const TEXT = {
-  consent: `<h2>[PLACEHOLDER] Consent</h2>
-    <p>[PLACEHOLDER] Study purpose, what participants will do, about how long it takes,
-    payment, risks, data storage, contact details, and the right to stop at any time.</p>`,
   instructions: `<h2>Instructions</h2>
     <p>You will read two posts from Reddit's "Am I the Asshole?" (AITA) community and
     discuss each one in a group chat with a Host and five AI agents.</p>
