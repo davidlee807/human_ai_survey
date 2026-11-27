@@ -95,8 +95,8 @@ function factualListHtml(postId, agentVerdict, verdict) {
   return `<details class="chat-context"><summary>Show the post again</summary>${postHtml(POSTS[postId])}</details>
     <div class="factual factual-page"><div class="fl-title">${FACTUAL.title}</div>
     <div class="fl-verdict gen">Verdict: ${agentVerdict} (${AGENTS.length}/${AGENTS.length} agents)</div>
-    <div class="fl-head gen">PROS: points for ${agentVerdict}</div><ul>${items(list.pros)}</ul>
-    <div class="fl-head gen">CONS: points against ${verdict}</div><ul>${items(list.cons)}</ul></div>`;
+    <div class="fl-head gen">Points for ${agentVerdict}</div><ul>${items(list.pros)}</ul>
+    <div class="fl-head gen">Points against ${verdict} (your verdict)</div><ul>${items(list.cons)}</ul></div>`;
 }
 
 // Makes the list look machine-generated: each line is typed out character by character,
